@@ -5,7 +5,8 @@ const routes: Routes = [
   {
     path: 'Book',
     loadChildren:() => import('./Book/book-layout.module').then(module => module.BookLayoutModule)
-  }
+  },
+  {path: '', redirectTo: 'Book/Home', pathMatch: 'full'},
 ];
 
 @NgModule({

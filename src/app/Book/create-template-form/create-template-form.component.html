@@ -1,1 +1,100 @@
-<p>create-template-form works!</p>
+
+<div *ngIf="formSubmitted">
+    Please wait your form is submitted
+</div>
+<div class="Formcontainer filter-form-container rounded shadow-sm p-3" *ngIf="!formSubmitted">
+    <h3 class="mb-3">Add Book - Template Driven Form</h3>
+    <form #bookForm="ngForm" (ngSubmit)="submited(bookForm)">
+
+        <!-- Title -->
+        <div class="form-group mb-3">
+            <label for="bookTitle" class="form-label">Title</label>
+            <input type="text" id="bookTitle" class="form-control" [(ngModel)]="bookModel.title" name="title"
+                placeholder="Enter title" required minlength="3" #titleInput="ngModel"
+                [ngClass]="{ 'is-invalid': formSubmitted && titleInput.invalid }">
+            <div *ngIf="formSubmitted && titleInput.invalid" class="invalid-feedback">
+                <div *ngIf="titleInput.errors?.['required']">Title is required.</div>
+                <div *ngIf="titleInput.errors?.['minlength']">Title must be at least 3 characters.</div>
+            </div>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group mb-3">
+            <label for="bookDescription" class="form-label">Description</label>
+            <textarea id="bookDescription" class="form-control" rows="3" [(ngModel)]="bookModel.description"
+                name="description" placeholder="Enter book description" required maxlength="500"
+                #descriptionInput="ngModel"
+                [ngClass]="{ 'is-invalid': formSubmitted && descriptionInput.invalid }"></textarea>
+            <div *ngIf="formSubmitted && descriptionInput.invalid" class="invalid-feedback">
+                <div *ngIf="descriptionInput.errors?.['required']">Description is required.</div>
+                <div *ngIf="descriptionInput.errors?.['maxlength']">Description cannot exceed 500 characters.</div>
+            </div>
+        </div>
+
+        <!-- Pages -->
+        <div class="form-group mb-3">
+            <label for="bookPages" class="form-label">Pages</label>
+            <input type="number" id="bookPages" class="form-control" [(ngModel)]="bookModel.pages" name="pages"
+                placeholder="Number of pages" required min="1" pattern="^[0-9]*$" #pagesInput="ngModel"
+                [ngClass]="{ 'is-invalid': formSubmitted && pagesInput.invalid }">
+            <div *ngIf="formSubmitted && pagesInput.invalid" class="invalid-feedback">
+                <div *ngIf="pagesInput.errors?.['required']">Number of pages is required.</div>
+                <div *ngIf="pagesInput.errors?.['min']">Pages must be at least 1.</div>
+                <div *ngIf="pagesInput.errors?.['pattern']">Please enter a valid number.</div>
+            </div>
+        </div>
+
+        <!-- Author -->
+        <div class="form-group mb-3">
+            <label for="bookAuthorSelect" class="form-label">Author</label>
+            <mat-form-field class="select-boxes w-100" appearance="outline">
+                <mat-label>Select Author Name</mat-label>
+                <mat-select id="bookAuthorSelect" [(ngModel)]="bookModel.author" name="author" required
+                    #authorInput="ngModel"
+                    [ngClass]="{ 'is-invalid': formSubmitted && authorInput.invalid && authorInput.touched }">
+                    <mat-option *ngFor="let auth of Authors" [value]="auth">{{ auth }}</mat-option>
+                </mat-select>
+                <mat-error *ngIf="formSubmitted && authorInput.invalid && authorInput.errors?.['required']">
+                    Author is required.
+                </mat-error>
+            </mat-form-field>
+        </div>
+
+        <!-- Categories -->
+        <div class="form-group mb-3">
+            <label for="bookCategoriesSelect" class="form-label">Categories</label>
+            <mat-form-field class="select-boxes w-100" appearance="outline">
+                <mat-label>Select Categories Name</mat-label>
+                <mat-select id="bookCategoriesSelect" [(ngModel)]="bookModel.categories" name="categories" required
+                    multiple #categoriesInput="ngModel"
+                    [ngClass]="{ 'is-invalid': formSubmitted && categoriesInput.invalid && categoriesInput.touched }">
+                    <mat-option *ngFor="let cat of Categories" [value]="cat">{{ cat}}</mat-option>
+                </mat-select>
+                <mat-error *ngIf="formSubmitted && categoriesInput.invalid && categoriesInput.errors?.['required']">
+                    Categories is required.
+                </mat-error>
+            </mat-form-field>
+        </div>
+
+        <!-- Publisher -->
+        <div class="form-group mb-3">
+            <label for="bookPublisherSelect" class="form-label">Publisher</label> <!-- Corrected for attribute -->
+            <mat-form-field class="select-boxes w-100" appearance="outline">
+                <mat-label>Select Publisher Name</mat-label>
+                <mat-select id="bookPublisherSelect" [(ngModel)]="bookModel.publisher" name="publisher" required
+                    #publisherInput="ngModel"
+                    [ngClass]="{ 'is-invalid': formSubmitted && publisherInput.invalid && publisherInput.touched }">
+                    <!-- Corrected 'is-inssvalid' to 'is-invalid' -->
+                    <mat-option *ngFor="let publication of Publishers" [value]="publication">{{ publication
+                        }}</mat-option>
+                </mat-select>
+                <mat-error *ngIf="formSubmitted && publisherInput.invalid && publisherInput.errors?.['required']">
+                    Publisher is required.
+                </mat-error>
+            </mat-form-field>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 mt-2">Submit</button>
+
+    </form>
+</div>

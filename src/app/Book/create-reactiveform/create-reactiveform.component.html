@@ -1,1 +1,91 @@
-<p>create-reactiveform works!</p>
+<div *ngIf="formSubmitted">
+    Please wait your form is submitted
+</div>
+<div class="Formcontainer filter-form-container rounded shadow-sm p-3" *ngIf="!formSubmitted">
+    <h3 class="mb-3">Add Book - Reactive Form </h3>
+    <form [formGroup]="bookForm">
+        <!-- Title -->
+        <div class="form-group mb-3">
+            <label for="bookTitle" class="form-label">Title</label>
+            <input type="text" id="bookTitle" class="form-control" formControlName="title" placeholder="Enter title"
+                [ngClass]="{ 'is-invalid': formSubmitted && title?.invalid }">
+            <div *ngIf="formSubmitted && title?.invalid" class="invalid-feedback">
+                <div *ngIf="title?.errors?.['required']">Title is required.</div>
+                <div *ngIf="title?.errors?.['minlength']">Title must be at least 3 characters.</div>
+            </div>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group mb-3">
+            <label for="bookDescription" class="form-label">Description</label>
+            <textarea id="bookDescription" class="form-control" rows="3" formControlName="description"
+                placeholder="Enter book description"
+                [ngClass]="{ 'is-invalid': formSubmitted && description?.invalid }"></textarea>
+            <div *ngIf="formSubmitted && description?.invalid" class="invalid-feedback">
+                <div *ngIf="description?.errors?.['required']">Description is required.</div>
+                <div *ngIf="description?.errors?.['maxlength']">Description cannot exceed 500 characters.</div>
+            </div>
+        </div>
+
+        <!-- Pages -->
+        <div class="form-group mb-3">
+            <label for="bookPages" class="form-label">Pages</label>
+            <input type="number" id="bookPages" class="form-control" formControlName="pages"
+                placeholder="Number of pages" [ngClass]="{ 'is-invalid': formSubmitted && pages?.invalid }">
+            <div *ngIf="formSubmitted && pages?.invalid" class="invalid-feedback">
+                <div *ngIf="pages?.errors?.['required']">Number of pages is required.</div>
+                <div *ngIf="pages?.errors?.['min']">Pages must be at least 1.</div>
+                <div *ngIf="pages?.errors?.['pattern']">Please enter a valid number.</div>
+            </div>
+        </div>
+
+        <!-- Author -->
+        <div class="form-group mb-3">
+            <label for="bookAuthorSelect" class="form-label">Author</label>
+            <mat-form-field class="select-boxes w-100" appearance="outline">
+                <mat-label>Select Author Name</mat-label>
+                <mat-select id="bookAuthorSelect" formControlName="author"
+                    [ngClass]="{ 'is-invalid': formSubmitted && author?.invalid && author?.touched }">
+                    <mat-option *ngFor="let auth of Authors" [value]="auth">{{ auth }}</mat-option>
+                </mat-select>
+                <mat-error *ngIf="formSubmitted && author?.invalid && author?.errors?.['required']">
+                    Author is required.
+                </mat-error>
+            </mat-form-field>
+        </div>
+
+        <!-- Categories -->
+        <div class="form-group mb-3">
+            <label for="bookAuthorSelect" class="form-label">Categories</label>
+            <mat-form-field class="select-boxes w-100" appearance="outline">
+                <mat-label>Select Categories Name</mat-label>
+                <mat-select id="bookCategories" formControlName="categories"
+                    [ngClass]="{ 'is-invalid': formSubmitted && categories?.invalid && categories?.touched }" multiple>
+                    <mat-option *ngFor="let cat of Categories" [value]="cat">{{ cat}}</mat-option>
+                </mat-select>
+                <mat-error *ngIf="formSubmitted && categories?.invalid && categories?.errors?.['required']">
+                    Categories is required.
+                </mat-error>
+            </mat-form-field>
+        </div>
+
+        <!-- Publisher -->
+        <div class="form-group mb-3">
+            <label for="bookAuthorSelect" class="form-label">Publisher</label>
+            <mat-form-field class="select-boxes w-100" appearance="outline">
+                <mat-label>Select Publisher Name</mat-label>
+                <mat-select id="bookPublisher" formControlName="publisher"
+                    [ngClass]="{ 'is-inssvalid': formSubmitted && publisher?.invalid && publisher?.touched }">
+                    <mat-option *ngFor="let publication of Publishers" [value]="publication">{{ publication
+                        }}</mat-option>
+                </mat-select>
+                <mat-error *ngIf="formSubmitted && publisher?.invalid && publisher?.errors?.['required']">
+                    Publisher is required.
+                </mat-error>
+            </mat-form-field>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 mt-2" (click)="submited()">Submit</button>
+
+    </form>
+</div>

@@ -1,0 +1,9 @@
+  body {
+        background-color: #f8f9fa; /* Light gray background for the page */
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* A slightly more modern font stack */
+    }
+
+    .table th,
+    .table td {
+        vertical-align: middle; /* Ensures content in cells is vertically centered */
+    }

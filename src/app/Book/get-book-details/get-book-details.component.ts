@@ -1,4 +1,6 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, Inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Book } from 'src/app/Shared/Models/Book/Book.Module';
 
 @Component({
   selector: 'app-get-book-details',
@@ -6,16 +8,9 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
   styleUrls: ['./get-book-details.component.css']
 })
 export class GetBookDetailsComponent {
-
-  @Input() bookSingle: any;
-  @Input() ModalVisible: boolean = false;
-  @Output() ModalVisibleChange = new EventEmitter<boolean>();
-
-  Book: any = null;
-  Bookid: number | null = null;
-  closeDialog() {
-    this.ModalVisibleChange.emit(this.ModalVisible = false);
-  }
-
+  constructor(
+    public dialogRef: MatDialogRef<GetBookDetailsComponent>,
+    @Inject(MAT_DIALOG_DATA) public book: Book
+  ) { }
 
 }

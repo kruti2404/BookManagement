@@ -4,6 +4,7 @@
 <div class="Formcontainer filter-form-container rounded shadow-sm p-3" *ngIf="!formSubmitted">
     <h3 class="mb-3">Add Book - Reactive Form </h3>
     <form [formGroup]="bookForm">
+
         <!-- Title -->
         <div class="form-group mb-3">
             <label for="bookTitle" class="form-label">Title</label>
@@ -37,6 +38,30 @@
                 <div *ngIf="pages?.errors?.['min']">Pages must be at least 1.</div>
                 <div *ngIf="pages?.errors?.['pattern']">Please enter a valid number.</div>
             </div>
+        </div>
+
+        <!-- Price -->
+        <div class="form-group mb-3">
+            <label for="bookPrice" class="form-label">Price</label>
+            <input type="number" id="bookPrice" class="form-control" formControlName="price"
+                placeholder="Enter the Price" [ngClass]="{ 'is-invalid': formSubmitted && price?.invalid }">
+            <div *ngIf="formSubmitted && pages?.invalid" class="invalid-feedback">
+                <div *ngIf="price?.errors?.['required']">Price is required.</div>
+                <div *ngIf="price?.errors?.['min']">Price must be at least 1.</div>
+                <div *ngIf="price?.errors?.['pattern']">Please enter a valid number.</div>
+            </div>
+        </div>
+
+        <!-- Language -->
+        <div class="form-group mb-3">
+            <label for="bookLanguage" class="form-label">Language</label>
+            <input type="text" id="booklanguage" class="form-control" formControlName="language"
+                placeholder="Enter Language" [ngClass]="{ 'is-invalid': formSubmitted && language?.invalid }">
+            <div *ngIf="formSubmitted && language?.invalid" class="invalid-feedback">
+                <div *ngIf="language?.errors?.['required']">Language is required.</div>
+                <div *ngIf="language?.errors?.['minlength']">Language must be at least 3 characters.</div>
+            </div>
+
         </div>
 
         <!-- Author -->

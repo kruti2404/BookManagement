@@ -17,10 +17,12 @@ import { GetBookDetailsComponent } from './get-book-details/get-book-details.com
 
 import { MatTableModule } from '@angular/material/table';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon'; 
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+import { MatChipsModule } from '@angular/material/chips';
+import { DeleteBookComponent } from './delete-book/delete-book.component';
 
 @NgModule({
   declarations: [
@@ -32,6 +34,7 @@ import { MatDialogModule } from '@angular/material/dialog';
     GetReactiveFormBookComponent,
     GetTemplateDrivenFormBookComponent,
     GetBookDetailsComponent,
+    DeleteBookComponent,
 
   ],
   imports: [
@@ -47,7 +50,8 @@ import { MatDialogModule } from '@angular/material/dialog';
     MatCardModule,
     MatButtonModule,
     MatIconModule,
-    MatDialogModule
+    MatDialogModule,
+    MatChipsModule
   ],
   exports: [
 

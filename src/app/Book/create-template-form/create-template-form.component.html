@@ -1,4 +1,3 @@
-
 <div *ngIf="formSubmitted">
     Please wait your form is submitted
 </div>
@@ -41,6 +40,31 @@
                 <div *ngIf="pagesInput.errors?.['required']">Number of pages is required.</div>
                 <div *ngIf="pagesInput.errors?.['min']">Pages must be at least 1.</div>
                 <div *ngIf="pagesInput.errors?.['pattern']">Please enter a valid number.</div>
+            </div>
+        </div>
+
+        <!-- Price -->
+        <div class="form-group mb-3">
+            <label for="bookPrice" class="form-label">Price</label>
+            <input type="number" id="bookPrice" class="form-control" [(ngModel)]="bookModel.price" name="price"
+                placeholder="Enter Price" required min="1" pattern="^[0-9]*$" #priceInput="ngModel"
+                [ngClass]="{ 'is-invalid': formSubmitted && priceInput.invalid }">
+            <div *ngIf="formSubmitted && priceInput.invalid" class="invalid-feedback">
+                <div *ngIf="priceInput.errors?.['required']">Price is required.</div>
+                <div *ngIf="priceInput.errors?.['min']">Price must be at least 1.</div>
+                <div *ngIf="priceInput.errors?.['pattern']">Please enter a valid number.</div>
+            </div>
+        </div>
+
+        <!-- Title -->
+        <div class="form-group mb-3">
+            <label for="booklanguage" class="form-label">Language</label>
+            <input type="text" id="booklanguage" class="form-control" [(ngModel)]="bookModel.language" name="language"
+                placeholder="Enter Language" required minlength="3" #languageInput="ngModel"
+                [ngClass]="{ 'is-invalid': formSubmitted && languageInput.invalid }">
+            <div *ngIf="formSubmitted && languageInput.invalid" class="invalid-feedback">
+                <div *ngIf="languageInput.errors?.['required']">Language is required.</div>
+                <div *ngIf="languageInput.errors?.['minlength']">Language must be at least 3 characters.</div>
             </div>
         </div>
 

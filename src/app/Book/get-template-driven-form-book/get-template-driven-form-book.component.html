@@ -29,9 +29,12 @@
                                 <th scope="col">Title</th>
                                 <th scope="col">Description</th>
                                 <th scope="col">Pages</th>
+                                <th scope="col">Price</th>
+                                <th scope="col">Language</th>
                                 <th scope="col">Author</th>
                                 <th scope="col">Category</th>
                                 <th scope="col">Publisher</th>
+                                <th scope="col">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -41,6 +44,8 @@
                                 <td>{{ item.description | slice:0:100 }}{{ item.description && item.description.length >
                                     100 ? '...' : '' }}</td>
                                 <td class="text-center">{{ item.pages }}</td>
+                                <td class="text-center">{{ item.price }}</td>
+                                <td class="text-center">{{ item.language }}</td>
                                 <td>{{ item.author }}</td>
                                 <td>
                                     <div *ngFor="let cat of item.splitedCategories">
@@ -48,7 +53,13 @@
                                     </div>
                                 </td>
                                 <td>{{ item.publisher }}</td>
-                                
+                                <td>
+                                    <button mat-button color="primary" (click)="openBookDetails(item)">Details</button>
+                                    <button mat-button color="primary" class="text text-danger"
+                                        (click)="openDelteBook(item)">Delete</button>
+
+                                </td>
+
                             </tr>
                             <tr *ngIf="Books && Books.length === 0">
                                 <td colspan="7" class="text-center fst-italic py-4">

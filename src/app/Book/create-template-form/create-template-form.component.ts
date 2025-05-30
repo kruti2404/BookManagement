@@ -7,6 +7,8 @@ interface BookFormModel {
   title: string;
   description: string;
   pages: number | null;
+  price : number |null;
+  language:string;
   author: string;
   categories: string[];
   publisher: string;
@@ -24,6 +26,8 @@ export class CreateTemplateFormComponent implements OnInit {
     title: '',
     description: '',
     pages: null,
+    price : null,
+    language : '',
     author: '',
     categories: [],
     publisher: ''
@@ -66,6 +70,8 @@ export class CreateTemplateFormComponent implements OnInit {
       bookData.title = this.bookModel.title;
       bookData.description = this.bookModel.description;
       bookData.pages = this.bookModel.pages || 0;
+      bookData.price = this.bookModel.price || 0;
+      bookData.language = this.bookModel.language ;
       bookData.author = this.bookModel.author;
       bookData.categories = this.bookModel.categories.join(', ');
       bookData.publisher = this.bookModel.publisher;

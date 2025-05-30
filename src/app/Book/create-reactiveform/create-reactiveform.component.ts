@@ -11,6 +11,7 @@ import { Book } from 'src/app/Shared/Models/Book/Book.Module';
 export class CreateReactiveformComponent implements OnInit {
 
   bookForm!: FormGroup;
+
   Authors: string[] = [
     'Ruskin Bond', 'Shashi Deshpande', 'Jhumpa Lahiri', 'Anukrti Upadhyay', 'Arundathi Roy', 'Rabindranath Tagore', 'Shubhangi Swarup',
     'Neharika Gupta', 'Salman Rushdie', 'Madhuri Vijay', 'Vikram Seth', 'Rehana Munir', 'Khushwant Singh', 'Amitav Ghosh', 'Shuma Raha',
@@ -34,6 +35,8 @@ export class CreateReactiveformComponent implements OnInit {
       title: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', [Validators.required, Validators.maxLength(500)]],
       pages: [null, [Validators.required, Validators.min(1), Validators.pattern("^[0-9]*$")]],
+      price:[null, [Validators.required, Validators.min(1), Validators.pattern("^[0-9]*$")]],
+      language: ['', [Validators.required, Validators.maxLength(15)]],
       author: ['', Validators.required],
       categories: ['', Validators.required],
       publisher: ['', Validators.required]
@@ -43,6 +46,8 @@ export class CreateReactiveformComponent implements OnInit {
   get title() { return this.bookForm.get('title'); }
   get description() { return this.bookForm.get('description'); }
   get pages() { return this.bookForm.get('pages'); }
+  get price() { return this.bookForm.get('price'); }
+  get language() { return this.bookForm.get('language'); }
   get author() { return this.bookForm.get('author'); }
   get categories() { return this.bookForm.get('categories'); }
   get publisher() { return this.bookForm.get('publisher'); }
@@ -73,6 +78,7 @@ export class CreateReactiveformComponent implements OnInit {
           console.log("The data is ", value);
           if (value.statusCode == 0) {
             console.log("The data successfully sumbmitted");
+            alert("SuccessFully submitted the data");
           }
           else {
             alert(`Error while adding ${value.message}`)

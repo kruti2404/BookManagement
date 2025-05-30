@@ -1,7 +1,5 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
-import {  Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { Book } from 'src/app/Shared/Models/Book/Book.Module';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { Response } from 'src/app/Shared/Models/Response/Response.Module';
 import { environment } from 'src/environments/environment';
 
@@ -11,20 +9,60 @@ import { environment } from 'src/environments/environment';
 export class BookService {
 
   constructor(
-    private http :HttpClient
+    private http: HttpClient
   ) { }
   private baseUrl = environment.baseurl;
-  private serviceurl = this.baseUrl+'/api/Book';
+  private serviceurl = this.baseUrl + '/api/Book';
 
-  public getBooks(FormType: string): Observable<any>{
-    return this.http.get(this.serviceurl+'/getBooks', {
-      params:{FormType}
+  public getBooks(FormType: string): Promise<Response> {
+    return new Promise((resolve, reject) => {
+      this.http.get<Response>(this.serviceurl + '/getBooks', { params: { FormType } }).subscribe({
+        next: (value: Response) => {
+          if (value.statusCode == 1) {
+            reject(value.message);
+          } else {
+            resolve(value);
+          }
+        },
+        error: (err) => {
+          console.error("HTTP Error: ", err);
+          reject(err);
+        },
+        complete: () => {
+          console.log("Request completed.");
+        }
+      });
     });
   }
 
-  public createBook(createBook : FormData){
+
+  public createBook(createBook: FormData) {
+
     console.log("The data of book from the create page ", createBook);
-    
-    return this.http.post<Response>(`${this.serviceurl}/createBook`, createBook );    
+    return this.http.post<Response>(`${this.serviceurl}/createBook`, createBook);
+
   }
+
+  public deleteBook(id: string): Promise<Response> {
+    console.log("Service delteBook ", id);
+
+    return new Promise((resolve, reject) => {
+      this.http.post<Response>(this.serviceurl + '/deleteBook', { "id": id }, { headers: { 'Content-Type': 'application/json' } }).subscribe({
+        next: (value: Response) => {
+          if (value.statusCode == 0) {
+            resolve(value);
+          }
+          reject(value.message);
+        },
+        error: (err) => {
+          console.error("HTTP Error: ", err);
+          reject(err);
+        },
+        complete: () => {
+          console.log("Request completed.");
+        },
+      })
+    });
+  }
+
 }

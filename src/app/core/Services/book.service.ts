@@ -37,7 +37,6 @@ export class BookService {
 
 
   public createBook(createBook: FormData) {
-
     console.log("The data of book from the create page ", createBook);
     return this.http.post<Response>(`${this.serviceurl}/createBook`, createBook);
 
@@ -63,6 +62,29 @@ export class BookService {
         },
       })
     });
+  }
+
+  public getBookById(id: string ): Promise<Response> {
+    return new Promise((resolve, reject) => {
+      this.http.get<Response>(this.serviceurl + '/getBookById', { params: { id } }).subscribe({
+        next: (value: Response) => {
+          if (value.statusCode == 1) {
+            reject(value.message);
+          } else {
+            resolve(value);
+          }
+        },
+        error: (err) => {
+          console.error("HTTP Error: ", err);
+          reject(err);
+        },
+        complete: () => {
+          console.log("Request completed.");
+        }
+      });
+    });
+
+
   }
 
 }

@@ -1,5 +1,7 @@
+import { ValueConverter } from '@angular/compiler/src/render3/view/template';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { BookService } from 'src/app/core/Services/book.service';
 import { Book } from 'src/app/Shared/Models/Book/Book.Module';
 
@@ -11,6 +13,9 @@ import { Book } from 'src/app/Shared/Models/Book/Book.Module';
 export class CreateReactiveformComponent implements OnInit {
 
   bookForm!: FormGroup;
+  iseditMode!: boolean;
+  id!: string;
+  formdata = new FormData();
 
   Authors: string[] = [
     'Ruskin Bond', 'Shashi Deshpande', 'Jhumpa Lahiri', 'Anukrti Upadhyay', 'Arundathi Roy', 'Rabindranath Tagore', 'Shubhangi Swarup',
@@ -27,20 +32,54 @@ export class CreateReactiveformComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private bookService: BookService
+    private bookService: BookService,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
+
+    this.id = this.route.snapshot.params['id'];
+    this.iseditMode = this.id !== null;
+
+
     this.bookForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', [Validators.required, Validators.maxLength(500)]],
       pages: [null, [Validators.required, Validators.min(1), Validators.pattern("^[0-9]*$")]],
-      price:[null, [Validators.required, Validators.min(1), Validators.pattern("^[0-9]*$")]],
+      price: [null, [Validators.required, Validators.min(1), Validators.pattern("^[0-9]*$")]],
       language: ['', [Validators.required, Validators.maxLength(15)]],
       author: ['', Validators.required],
       categories: ['', Validators.required],
       publisher: ['', Validators.required]
     });
+
+    if (this.iseditMode) {
+      this.bookService.getBookById(this.id)
+        .then((value: any) => {
+          console.log("Success: ", value);
+          // this.bookForm.patchValue(value.data);
+
+          this.title?.setValue(value.data.description);
+          this.description?.setValue(value.data.description);
+          this.pages?.setValue(value.data.pages);
+          this.price?.setValue(value.data.price);
+          this.language?.setValue(value.data.language);
+          this.author?.setValue(value.data.author);
+          this.publisher?.setValue(value.data.publisher);
+          const categoriesArray: string[] = (value.data.categories as string).split(", ");
+          this.categories?.setValue(categoriesArray);
+
+          // this.bookForm.setValue({ categories: ['Horror'] })
+          console.log(this.title?.value);
+          // this.bookForm.setValue({ categories: categoriesArray });
+
+        })
+        .catch((err: any) => {
+          console.error("Error: ", err);
+
+        });
+    }
+
   }
 
   get title() { return this.bookForm.get('title'); }
@@ -55,6 +94,7 @@ export class CreateReactiveformComponent implements OnInit {
 
 
   submited() {
+
     this.formSubmitted = true;
     if (this.bookForm.valid) {
       const bookData: Book = {
@@ -63,42 +103,57 @@ export class CreateReactiveformComponent implements OnInit {
       };
       console.log('Form Submitted! Data:', bookData);
 
-      const formdata = new FormData();
-
       Object.entries(bookData).forEach(([key, value]) => {
         if (Array.isArray(value)) {
-          formdata.append(key, value.join(', '));
+          this.formdata.append(key, value.join(', '));
         } else {
-          formdata.append(key, value as string);
+          this.formdata.append(key, value as string);
         }
       });
 
-      this.bookService.createBook(formdata).subscribe({
-        next: (value) => {
-          console.log("The data is ", value);
-          if (value.statusCode == 0) {
-            console.log("The data successfully sumbmitted");
-            alert("SuccessFully submitted the data");
-          }
-          else {
-            alert(`Error while adding ${value.message}`)
-          }
-          this.resetForm();
-
-        },
-        error: (err) => {
-          console.log("Error while executing the post request ", err);
-        },
-        complete() {
-          console.log("Completed the post request ");
-        },
-      });
+      if (this.iseditMode) {
+        console.log("EditMode is on");
+        this.editBook();
+      }
+      else {
+        this.createBook();
+      }
 
 
     } else {
       console.log('Form is invalid. Please check the fields.');
       this.bookForm.markAllAsTouched();
     }
+
+
+  }
+
+  createBook() {
+
+    this.bookService.createBook(this.formdata).subscribe({
+      next: (value) => {
+        console.log("The data is ", value);
+        if (value.statusCode == 0) {
+          console.log("The data successfully sumbmitted");
+          alert("SuccessFully submitted the data");
+        }
+        else {
+          alert(`Error while adding ${value.message}`)
+        }
+        this.resetForm();
+
+      },
+      error: (err) => {
+        console.log("Error while executing the post request ", err);
+      },
+      complete() {
+        console.log("Completed the post request ");
+      },
+    });
+  }
+
+  editBook(){
+
   }
 
   resetForm() {

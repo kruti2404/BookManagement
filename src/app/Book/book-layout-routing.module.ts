@@ -23,6 +23,7 @@ const routes: Routes = [
       },
       { path: "", redirectTo: "Home", pathMatch: "full" },
       { path: "createreactive", component: CreateReactiveformComponent },
+      { path: "editbook/:id", component: CreateReactiveformComponent },
       { path: "createtemplate", component: CreateTemplateFormComponent }
     ]
   }

@@ -14,7 +14,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatOptionModule, } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { GetBookDetailsComponent } from './get-book-details/get-book-details.component';
-
+import {MatPaginatorModule} from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -51,7 +51,8 @@ import { DeleteBookComponent } from './delete-book/delete-book.component';
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
-    MatChipsModule
+    MatChipsModule,
+    MatPaginatorModule
   ],
   exports: [
 

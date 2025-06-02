@@ -1,17 +1,16 @@
-import { ValueConverter } from '@angular/compiler/src/render3/view/template';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BookService } from 'src/app/core/Services/book.service';
 import { Book } from 'src/app/Shared/Models/Book/Book.Module';
-
+import { Response } from './../../Shared/Models/Response/Response.Module'
 @Component({
   selector: 'app-create-reactiveform',
   templateUrl: './create-reactiveform.component.html',
   styleUrls: ['./create-reactiveform.component.css']
 })
 export class CreateReactiveformComponent implements OnInit {
-
+  loading: boolean = false;
   bookForm!: FormGroup;
   iseditMode!: boolean;
   id!: string;
@@ -33,14 +32,15 @@ export class CreateReactiveformComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private bookService: BookService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
 
+   
     this.id = this.route.snapshot.params['id'];
     this.iseditMode = this.id !== null;
-
 
     this.bookForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
@@ -57,9 +57,7 @@ export class CreateReactiveformComponent implements OnInit {
       this.bookService.getBookById(this.id)
         .then((value: any) => {
           console.log("Success: ", value);
-          // this.bookForm.patchValue(value.data);
-
-          this.title?.setValue(value.data.description);
+          this.title?.setValue(value.data.title);
           this.description?.setValue(value.data.description);
           this.pages?.setValue(value.data.pages);
           this.price?.setValue(value.data.price);
@@ -69,9 +67,6 @@ export class CreateReactiveformComponent implements OnInit {
           const categoriesArray: string[] = (value.data.categories as string).split(", ");
           this.categories?.setValue(categoriesArray);
 
-          // this.bookForm.setValue({ categories: ['Horror'] })
-          console.log(this.title?.value);
-          // this.bookForm.setValue({ categories: categoriesArray });
 
         })
         .catch((err: any) => {
@@ -94,70 +89,91 @@ export class CreateReactiveformComponent implements OnInit {
 
 
   submited() {
-
+    this.loading = true;
     this.formSubmitted = true;
-    if (this.bookForm.valid) {
-      const bookData: Book = {
-        formType: 'Reactive Form',
-        ...this.bookForm.value
-      };
-      console.log('Form Submitted! Data:', bookData);
 
-      Object.entries(bookData).forEach(([key, value]) => {
-        if (Array.isArray(value)) {
-          this.formdata.append(key, value.join(', '));
-        } else {
-          this.formdata.append(key, value as string);
-        }
-      });
+    if (this.bookForm.valid) {
+      const bookData: Book = new Book();
+      bookData.title = this.title?.value;
+      bookData.description = this.description?.value;
+      bookData.pages = this.pages?.value || 0;
+      bookData.price = this.price?.value || 0;
+      bookData.language = this.language?.value;
+      bookData.author = this.author?.value;
+      bookData.categories = this.categories?.value.join(', ');
+      bookData.publisher = this.publisher?.value;
+      bookData.splitedCategories = [...this.categories?.value];
+
 
       if (this.iseditMode) {
+        bookData.id = this.id;
+        console.log('Form Submitted! Data:', bookData);
+        Object.entries(bookData).forEach(([key, value]) => {
+          if (Array.isArray(value)) {
+            this.formdata.append(key, value.join(', '));
+          } else {
+            this.formdata.append(key, value as string);
+          }
+        });
+
         console.log("EditMode is on");
         this.editBook();
+
       }
       else {
+        bookData.formType = 'Reactive Form';
+
+        console.log('Form Submitted! Data:', bookData);
+        Object.entries(bookData).forEach(([key, value]) => {
+          if (Array.isArray(value)) {
+            this.formdata.append(key, value.join(', '));
+          } else {
+            this.formdata.append(key, value as string);
+          }
+        });
         this.createBook();
       }
-
-
     } else {
       console.log('Form is invalid. Please check the fields.');
       this.bookForm.markAllAsTouched();
     }
-
+    this.loading = false;
+    this.formSubmitted = false;
+    this.router.navigate(['/Book', 'Home']);
 
   }
 
   createBook() {
 
-    this.bookService.createBook(this.formdata).subscribe({
-      next: (value) => {
-        console.log("The data is ", value);
-        if (value.statusCode == 0) {
-          console.log("The data successfully sumbmitted");
-          alert("SuccessFully submitted the data");
-        }
-        else {
-          alert(`Error while adding ${value.message}`)
-        }
-        this.resetForm();
-
-      },
-      error: (err) => {
-        console.log("Error while executing the post request ", err);
-      },
-      complete() {
-        console.log("Completed the post request ");
-      },
-    });
-  }
-
-  editBook(){
+    this.bookService.createBook(this.formdata)
+      .then((value: Response) => {
+        console.log("Success:  ", value.message);
+      })
+      .catch((error: any) => {
+        console.error("Error: ", error);
+      })
 
   }
 
-  resetForm() {
-    this.formSubmitted = false;
-    this.bookForm.reset(this.bookForm.value);
+  editBook() {
+    this.bookService.editBook(this.formdata)
+      .then((value: any) => {
+        console.log("Success:  ", value.message);
+      })
+      .catch((error: any) => {
+        console.error("Error: ", error);
+      });
   }
+
+  getData() {
+    console.log("Data is being called");
+    this.bookService.getData()
+      .then((value: any) => {
+        console.log("Success data:  ", value.Data);
+      })
+      .catch((error: any) => {
+        console.error("Error: ", error);
+      });
+  }
+
 }

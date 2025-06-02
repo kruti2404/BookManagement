@@ -1,5 +1,113 @@
-<div class="container mt-4 mb-4">
+<div id="openRolesSection" class="container content-space-1">
+    <div class="w-md-75 w-lg-50 text-center mx-md-auto mb-5 mb-md-9">
+        Filters
+    </div>
 
+    <form [formGroup]="filterForm">
+        <div class="row gx-2 gx-md-3 mb-7">
+            <div class="col-sm-6 col-md-4 mb-2 mb-sm-0">
+                <mat-form-field class="select-boxes w-100" appearance="outline">
+                    <mat-label>Select Column</mat-label>
+                    <mat-select id="columnNameSelect" formControlName="ColumnName">
+                        <mat-option *ngFor="let column of Columns" [value]="column">{{ column }}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+            <div class="col-sm-6 col-md-4" *ngIf="filterForm.get('ColumnName')?.value == 'Name'">
+                <label for="bookTitle" class="form-label">Name</label>
+                <input type="text" id="bookName" class="form-control" formControlName="Name" placeholder="Enter title">
+                <button class="col-sm-6 col-md-3 btn btn-primary" type="button" (click)="AddFilter()">
+                    Plus
+                </button>
+            </div>
+
+            <div class="col-sm-6 col-md-3" *ngIf="filterForm.get('ColumnName')?.value == 'Description'">
+                <label for="bookDescription" class="form-label">Description</label>
+                <textarea id="bookDescription" class="form-control" formControlName="Description"
+                    placeholder="Enter Description"> </textarea>
+                <button class="col-sm-6 col-md-3 btn btn-primary" type="button" (click)="AddFilter()">
+                    Plus
+                </button>
+            </div>
+
+            <div class="col-sm-6 col-md-3" *ngIf="filterForm.get('ColumnName')?.value == 'Pages'">
+                <label for="bookPages" class="form-label">Pages</label>
+                <input type="number" id="bookPages" class="form-control" formControlName="Pages"
+                    placeholder="Number of pages">
+                <button class="col-sm-6 col-md-3 btn btn-primary" type="button" (click)="AddFilter()">
+                    Plus
+                </button>
+            </div>
+
+            <div class="col-sm-6 col-md-3" *ngIf="filterForm.get('ColumnName')?.value == 'Price'">
+                <label for="bookPrice" class="form-label">Price</label>
+                <input type="number" id="bookPrice" class="form-control" formControlName="Price"
+                    placeholder="Enter Price">
+                <button class="col-sm-6 col-md-3 btn btn-primary" type="button" (click)="AddFilter()">
+                    Plus
+                </button>
+            </div>
+
+            <div class="col-sm-6 col-md-3" *ngIf="filterForm.get('ColumnName')?.value == 'Language'">
+                <label for="bookLanguage" class="form-label">Language</label>
+                <input type="text" id="booklanguage" class="form-control" formControlName="Language"
+                    placeholder="Enter Language">
+                <button class="col-sm-6 col-md-3 btn btn-primary" type="button" (click)="AddFilter()">
+                    Plus
+                </button>
+            </div>
+            <div class="col-sm-6 col-md-3" *ngIf="filterForm.get('ColumnName')?.value == 'Author'">
+                <label for="bookAuthorSelect" class="form-label">Author</label>
+                <mat-form-field class="select-boxes w-100" appearance="outline">
+                    <mat-label>Select Author Name</mat-label>
+                    <mat-select id="bookAuthor" formControlName="Author">
+                        <mat-option *ngFor="let cat of Authors" [value]="cat.name">{{ cat.name}}</mat-option>
+                    </mat-select>
+
+                </mat-form-field>
+                <button class="col-sm-6 col-md-3 btn btn-primary" type="button" (click)="AddFilter()">
+                    Plus
+                </button>
+            </div>
+            <div class="col-sm-6 col-md-3" *ngIf="filterForm.get('ColumnName')?.value == 'Category'">
+                <label for="bookCategorySelect" class="form-label">Categories</label>
+                <mat-form-field class="select-boxes w-100" appearance="outline">
+                    <mat-label>Select Categories Name</mat-label>
+                    <mat-select id="bookCategories" formControlName="Category" multiple>
+                        <mat-option *ngFor="let cat of Categories" [value]="cat.name">{{ cat.name}}</mat-option>
+                    </mat-select>
+
+                </mat-form-field>
+                <button class="col-sm-6 col-md-3 btn btn-primary" type="button" (click)="AddFilter()">
+                    Plus
+                </button>
+            </div>
+            <div class="col-sm-6 col-md-3" *ngIf="filterForm.get('ColumnName')?.value == 'Publisher'">
+
+                <label for="bookPublisherSelect" class="form-label">Publisher</label>
+                <mat-form-field class="select-boxes w-100" appearance="outline">
+                    <mat-label>Select Publisher Name</mat-label>
+                    <mat-select id="bookPublisher" formControlName="Publisher">
+                        <mat-option *ngFor="let publication of Publishers" [value]="publication.name">{{
+                            publication.name
+                            }}</mat-option>
+                    </mat-select>
+
+                </mat-form-field>
+                <button class="col-sm-6 col-md-3 btn btn-primary" type="button" (click)="AddFilter()">
+                    Plus
+                </button>
+            </div>
+        </div>
+        <div>
+            <ul #Filters></ul>
+        </div>
+        <button type="submit" class="btn btn-primary w-20 mt-2" (click)="Applyfilter()">Apply Filter</button>
+    </form>
+</div>
+
+<div class="container mt-4 mb-4">
     <div *ngIf="loading" class="text-center py-5">
         <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
             <span class="visually-hidden">Loading...</span>
@@ -25,22 +133,77 @@
                     <table class="table table-striped table-hover align-middle">
                         <thead class="table-dark">
                             <tr>
-                                <th scope="col">ID</th>
-                                <th scope="col">Title</th>
+                                <th scope="col">
+                                    <i class="bi" *ngIf="sortColumn === 'name'"
+                                        [ngClass]="sortDirection === 'ASC' ? 'bi-sort-up' : 'bi-sort-down'"
+                                        style="cursor:pointer" (click)="onSort('name')" >
+                                    </i>
+                                    <span (click)="onSort('name')" style="cursor:pointer">
+                                        Title
+                                    </span>
+                                </th>
+
                                 <th scope="col">Description</th>
-                                <th scope="col">Pages</th>
-                                <th scope="col">Price</th>
-                                <th scope="col">Language</th>
-                                <th scope="col">Author</th>
-                                <th scope="col">Category</th>
-                                <th scope="col">Publisher</th>
+                                <th scope="col">
+                                    <i class="bi" *ngIf="sortColumn === 'pages'"
+                                        [ngClass]="sortDirection === 'ASC' ? 'bi-sort-up' : 'bi-sort-down'"
+                                        style="cursor:pointer" (click)="onSort('pages')" >
+                                    </i>
+                                    <span (click)="onSort('pages')" style="cursor:pointer">
+                                        Pages
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <i class="bi" *ngIf="sortColumn === 'price'"
+                                        [ngClass]="sortDirection === 'ASC' ? 'bi-sort-up' : 'bi-sort-down'"
+                                        style="cursor:pointer" (click)="onSort('price')" >
+                                    </i>
+                                    <span (click)="onSort('price')" style="cursor:pointer">
+                                        Price
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <i class="bi" *ngIf="sortColumn === 'language'"
+                                        [ngClass]="sortDirection === 'ASC' ? 'bi-sort-up' : 'bi-sort-down'"
+                                        style="cursor:pointer" (click)="onSort('language')" >
+                                    </i>
+                                    <span (click)="onSort('language')" style="cursor:pointer">
+                                        Language
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <i class="bi" *ngIf="sortColumn === 'author'"
+                                        [ngClass]="sortDirection === 'ASC' ? 'bi-sort-up' : 'bi-sort-down'"
+                                        style="cursor:pointer" (click)="onSort('author')" >
+                                    </i>
+                                    <span (click)="onSort('author')" style="cursor:pointer">
+                                        Author
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <i class="bi" *ngIf="sortColumn === 'category'"
+                                        [ngClass]="sortDirection === 'ASC' ? 'bi-sort-up' : 'bi-sort-down'"
+                                        style="cursor:pointer" (click)="onSort('category')" >
+                                    </i>
+                                    <span (click)="onSort('category')" style="cursor:pointer">
+                                        Category
+                                    </span>
+                                </th>
+                                <th scope="col">
+                                    <i class="bi" *ngIf="sortColumn === 'publisher'"
+                                        [ngClass]="sortDirection === 'ASC' ? 'bi-sort-up' : 'bi-sort-down'"
+                                        style="cursor:pointer" (click)="onSort('publisher')" >
+                                    </i>
+                                    <span (click)="onSort('publisher')" style="cursor:pointer">
+                                        Publisher
+                                    </span>
+                                </th>
                                 <th scope="col">Action</th>
 
                             </tr>
                         </thead>
                         <tbody>
                             <tr *ngFor="let item of Books;">
-                                <td>{{ item.id }}</td>
                                 <td class="fw-bold">{{ item.title }}</td>
                                 <td>{{ item.description | slice:0:100 }}{{ item.description && item.description.length >
                                     100 ? '...' : '' }}</td>
@@ -57,7 +220,10 @@
 
                                 <td>
                                     <button mat-button color="primary" (click)="openBookDetails(item)">Details</button>
-                                    <button mat-button color="primary" class="text text-danger" (click)="openDelteBook(item)">Delete</button>
+                                    <button mat-button color="primary" class="text text-danger"
+                                        (click)="openDelteBook(item)">Delete</button>
+                                    <button class="btn btn-primary"
+                                        [routerLink]="['/Book','editbook', item.id]">Edit</button>
                                 </td>
 
                             </tr>
@@ -68,6 +234,9 @@
                             </tr>
                         </tbody>
                     </table>
+                    <mat-paginator [length]="TotalBooks" [pageSize]="pageSize" [pageSizeOptions]="[1, 2, 5, 10]"
+                        [pageIndex]="PageNumber" (page)="pageEvent($event)" aria-label="Select page">
+                    </mat-paginator>
                 </div>
             </div>
         </div>

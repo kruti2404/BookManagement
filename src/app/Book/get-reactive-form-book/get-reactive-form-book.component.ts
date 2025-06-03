@@ -1,13 +1,17 @@
-import { Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core'; // Removed ElementRef, Renderer2
 import { BookService } from 'src/app/core/Services/book.service';
 import { Book } from 'src/app/Shared/Models/Book/Book.Module';
-import { Response } from 'src/app/Shared/Models/Response/Response.Module';
 import { GetBookDetailsComponent } from '../get-book-details/get-book-details.component';
 import { MatDialog } from '@angular/material/dialog';
 import { DeleteBookComponent } from '../delete-book/delete-book.component';
 import { FormControl, FormGroup } from '@angular/forms';
-import { filter } from 'rxjs';
 import { PageEvent } from '@angular/material/paginator';
+
+interface AppliedFilterItem {
+  column: string;
+  value: any;
+  displayValue: string;
+}
 
 @Component({
   selector: 'app-get-reactive-form-book',
@@ -35,33 +39,41 @@ export class GetReactiveFormBookComponent implements OnInit {
     Category: new FormControl([]),
     Publisher: new FormControl(''),
   });
+
   errorMessage: any;
-  Books: any | null;
+  Books: Book[] | null = [];
   Authors: any[] = [];
   Categories: any[] = [];
   Publishers: any[] = [];
+
+  // Columns available for selection in the dropdown
   Columns = ["Name", "Description", "Pages", "Price", "Language", "Author", "Category", "Publisher"];
-  FilterBook = new FormData();
-  @ViewChild('Filters') Filters!: ElementRef;
+  // Store the original full list of columns for resetting
+  private allOriginalColumns = [...this.Columns];
+  // Array to store the currently applied filters
+  appliedFiltersArray: AppliedFilterItem[] = [];
+
   PageNumber: number = 0;
-  pageSize: number = 1;
+  pageSize: number = 10;
   TotalBooks: number = 0;
-  sortColumn: string = '';
+  sortColumn: string = 'Title';
   sortDirection: string = 'ASC';
 
   ngOnInit(): void {
     this.getfilteredResult();
-    this.getData();
+    this.getDropdownData();
   }
+
+  // Getters for easier template access
   get ColumnName() { return this.filterForm.get('ColumnName'); }
   get Name() { return this.filterForm.get('Name'); }
   get Description() { return this.filterForm.get('Description'); }
   get Pages() { return this.filterForm.get('Pages'); }
   get Price() { return this.filterForm.get('Price'); }
   get Language() { return this.filterForm.get('Language'); }
-  get Author() { return this.filterForm.get('Author'); }
-  get Category() { return this.filterForm.get('Category'); }
-  get Publisher() { return this.filterForm.get('Publisher'); }
+  get AuthorCtrl() { return this.filterForm.get('Author'); }
+  get CategoryCtrl() { return this.filterForm.get('Category'); }
+  get PublisherCtrl() { return this.filterForm.get('Publisher'); }
 
 
   openBookDetails(book: Book): void {
@@ -78,140 +90,143 @@ export class GetReactiveFormBookComponent implements OnInit {
     });
   }
 
-
-
-  getData() {
-    console.log("Data is being called");
+  getDropdownData() {
     this.bookService.getData()
       .then((value: any) => {
-        console.log("Success data:  ", value.data.author);
-        this.Authors = value.data.author;
-        this.Categories = value.data.category;
-        this.Publishers = value.data.publisher;
+        this.Authors = value.data.author || [];
+        this.Categories = value.data.category || [];
+        this.Publishers = value.data.publisher || [];
       })
       .catch((error: any) => {
-        console.error("Error: ", error);
+        console.error("Error fetching dropdown data: ", error);
       });
   }
 
-  AddFilter() {
-    console.log("Add filter button");
-    console.log(this.Name?.value);
-    console.log(this.ColumnName?.value);
+  addFilter(): void {
+    const selectedColumn = this.ColumnName?.value;
+    if (!selectedColumn) return;
 
-    this.Columns = this.Columns.filter((ele, ind) => ele !== this.ColumnName?.value);
+    const filterControl = this.filterForm.get(selectedColumn);
+    if (!filterControl || filterControl.value === null || filterControl.value === '' || (Array.isArray(filterControl.value) && filterControl.value.length === 0)) {
+      return;
+    }
 
-    var value = this.ColumnName?.value;
-    if (value == 'Name') {
-      this.Filters.nativeElement.innerHTML += `<li>${this.ColumnName?.value} : ${this.Name?.value}</li>`;
-      this.Name?.reset();
-    }
-    else if (value == "Description") {
-      this.Filters.nativeElement.innerHTML += `<li>${this.ColumnName?.value} : ${this.Description?.value}</li>`;
-      this.Description?.reset();
-    }
-    else if (value == "Pages") {
-      this.Filters.nativeElement.innerHTML += `<li>${this.ColumnName?.value} : ${this.Pages?.value}</li>`;
-      this.Pages?.reset();
-    }
-    else if (value == "Price") {
-      this.Filters.nativeElement.innerHTML += `<li>${this.ColumnName?.value} : ${this.Price?.value}</li>`;
-      this.Price?.reset();
-    }
-    else if (value == "Language") {
-      this.Filters.nativeElement.innerHTML += `<li>${this.ColumnName?.value} : ${this.Language?.value}</li>`;
-      this.Language?.reset();
-    }
-    else if (value == "Author") {
-      this.Filters.nativeElement.innerHTML += `<li>${this.ColumnName?.value} : ${this.Author?.value}</li>`;
-      this.Author?.reset();
-    }
-    else if (value == "Category") {
-      this.Filters.nativeElement.innerHTML += `<li>${this.ColumnName?.value} : ${this.Category?.value}</li>`;
-      this.Category?.reset();
-    }
-    else if (value == "Publisher") {
-      this.Filters.nativeElement.innerHTML += `<li>${this.ColumnName?.value} : ${this.Publisher?.value}</li>`;
-      this.Publisher?.reset();
-    }
-    this.filterForm.get('ColumnName')?.reset();
-  }
+    const currentValue = filterControl.value;
+    let displayValue = '';
 
-  Applyfilter() {
-    console.log("Applying filter...");
+    if (selectedColumn === 'Category' && Array.isArray(currentValue)) {
+      displayValue = currentValue.join(', ');
+    } else {
+      displayValue = String(currentValue);
+    }
 
-    const html = this.Filters.nativeElement.innerHTML as string;
+    const existingFilterIndex = this.appliedFiltersArray.findIndex(f => f.column === selectedColumn);
+    if (existingFilterIndex > -1) {
+      this.appliedFiltersArray.splice(existingFilterIndex, 1);
+    }
 
-    let filterList = html.split('<li>').filter(ele => ele.trim() !== "");
-
-    const map = new Map<string, string>();
-
-    filterList.forEach(element => {
-      let [column, value] = element.split(":");
-      value = value.replace("</li>", "");
-      map.set(column.trim(), value.trim());
+    this.appliedFiltersArray.push({
+      column: selectedColumn,
+      value: currentValue,
+      displayValue: displayValue
     });
 
-    this.FilterBook = new FormData();
+    if (this.Columns.includes(selectedColumn)) {
+      this.Columns = this.Columns.filter(col => col !== selectedColumn);
+    }
 
-    map.forEach((value, key) => {
-      this.FilterBook.append(key, value);
-    });
-
-    this.FilterBook.append("form", "Reactive Form");
-    this.FilterBook.append("pageNumber", this.PageNumber.toString());
-    this.FilterBook.append("pageSize", this.pageSize.toString());
-
-    this.getfilteredResult();
+    filterControl.reset(selectedColumn === 'Category' ? [] : null);
+    this.ColumnName?.reset();
   }
 
-  getfilteredResult() {
+  removeFilter(index: number): void {
+    if (index > -1 && index < this.appliedFiltersArray.length) {
+      const removedFilter = this.appliedFiltersArray.splice(index, 1)[0];
+      if (!this.Columns.includes(removedFilter.column)) {
+        this.Columns.push(removedFilter.column);
+        this.Columns.sort((a, b) => this.allOriginalColumns.indexOf(a) - this.allOriginalColumns.indexOf(b));
+      }
+    }
+  }
+
+  clearAllFilters(): void {
+    this.appliedFiltersArray = [];
+    this.Columns = [...this.allOriginalColumns]; 
+    Object.keys(this.filterForm.controls).forEach(key => {
+      const control = this.filterForm.get(key);
+      if (key === 'Category') {
+        control?.reset([]);
+      } else {
+        control?.reset();
+      }
+    });
+    this.getfilteredResult(); 
+  }
+
+
+  getfilteredResult(): void {
     this.loading = true;
-    this.FilterBook.append("form", "Reactive Form");
-    this.FilterBook.append("pageNumber", this.PageNumber.toString());
-    this.FilterBook.append("pageSize", this.pageSize.toString());
+    this.error = false;
+    const formData = new FormData();
 
-    this.bookService.FilterBook(this.FilterBook)
-      .then(((value: any) => {
-        this.Books = value.data.books;
-        this.TotalBooks = value.data.count as number;
-        console.log("Total Books are ", this.TotalBooks)
-        this.Books.forEach((book: Book) => {
-          book.splitedCategories = (book.categories as string).split(", ");
-        });
-        console.log("Success:", value.message);
+    formData.append("form", "Reactive Form");
+    formData.append("pageNumber", this.PageNumber.toString());
+    formData.append("pageSize", this.pageSize.toString());
+    formData.append("sortColumn", this.sortColumn);
+    formData.append("sortDirection", this.sortDirection);
 
+    // Build FormData from appliedFiltersArray
+    this.appliedFiltersArray.forEach(filter => {
+      if (filter.column === 'Category' && Array.isArray(filter.value)) {
+        formData.append(filter.column, filter.value.join(','));
+      } else {
+        formData.append(filter.column, String(filter.value));
+      }
+    });
+
+    this.bookService.FilterBook(formData)
+      .then(((response: any) => {
+        if (response && response.data) {
+          this.Books = response.data.books as Book[];
+          this.TotalBooks = response.data.count as number;
+          if (this.Books) {
+            this.Books.forEach((book: Book) => {
+              if (book.categories && typeof book.categories === 'string') {
+                book.splitedCategories = book.categories.split(",").map(c => c.trim()).filter(c => c);
+              } else {
+                book.splitedCategories = [];
+              }
+            });
+          }
+        } else {
+          this.Books = [];
+          this.TotalBooks = 0;
+        }
         this.loading = false;
-        this.error = false;
-
       }))
-      .catch((error: any) => {
-        console.error("Error:", error);
+      .catch((err: any) => {
+        console.error("Error filtering books:", err);
         this.loading = false;
         this.error = true;
-        this.errorMessage = error.message || error;
+        this.errorMessage = err.message || err.error?.message || 'Failed to fetch books.';
+        this.Books = [];
+        this.TotalBooks = 0;
       });
   }
 
-  pageEvent(event: PageEvent) {
-    console.log("page Event ", event);
+  pageEvent(event: PageEvent): void {
     this.pageSize = event.pageSize;
     this.PageNumber = event.pageIndex;
-
     this.getfilteredResult();
   }
-  onSort(sortColumn: string) {
-    if (this.sortColumn == sortColumn) {
-      this.sortDirection = this.sortDirection == 'ASC' ? 'DESC' : 'ASC';
-    } else {
 
+  onSort(sortColumn: string): void {
+    if (this.sortColumn === sortColumn) {
+      this.sortDirection = this.sortDirection === 'ASC' ? 'DESC' : 'ASC';
+    } else {
+      this.sortColumn = sortColumn;
       this.sortDirection = 'ASC';
     }
-    this.sortColumn = sortColumn;
-    console.log(sortColumn);
-    console.log(this.sortDirection);
-
-
+    this.getfilteredResult();
   }
-
 }

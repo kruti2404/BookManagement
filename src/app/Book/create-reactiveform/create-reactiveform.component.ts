@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BookService } from 'src/app/core/Services/book.service';
 import { Book } from 'src/app/Shared/Models/Book/Book.Module';
 import { Response } from './../../Shared/Models/Response/Response.Module'
+import { formatDate } from '@angular/common';
 @Component({
   selector: 'app-create-reactiveform',
   templateUrl: './create-reactiveform.component.html',
@@ -15,7 +16,7 @@ export class CreateReactiveformComponent implements OnInit {
   iseditMode!: boolean;
   id!: string;
   formdata = new FormData();
-
+test:any[] = [];
   Authors: string[] = [
     'Ruskin Bond', 'Shashi Deshpande', 'Jhumpa Lahiri', 'Anukrti Upadhyay', 'Arundathi Roy', 'Rabindranath Tagore', 'Shubhangi Swarup',
     'Neharika Gupta', 'Salman Rushdie', 'Madhuri Vijay', 'Vikram Seth', 'Rehana Munir', 'Khushwant Singh', 'Amitav Ghosh', 'Shuma Raha',
@@ -37,6 +38,10 @@ export class CreateReactiveformComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.test = [{id:12,name:'test',data:'01/25/2025'}]
+    this.test.forEach((att)=>{
+      att.tempdata = formatDate(att.data,'yyyy-mm-dd','en');
+    });
 
    
     this.id = this.route.snapshot.params['id'];
@@ -165,15 +170,5 @@ export class CreateReactiveformComponent implements OnInit {
       });
   }
 
-  getData() {
-    console.log("Data is being called");
-    this.bookService.getData()
-      .then((value: any) => {
-        console.log("Success data:  ", value.Data);
-      })
-      .catch((error: any) => {
-        console.error("Error: ", error);
-      });
-  }
-
+  
 }

@@ -170,7 +170,7 @@ export class BookService {
             resolve(value);
           }
           else {
-            reject(value.message);
+            reject(value);
           }
         },
         error: (err) => {

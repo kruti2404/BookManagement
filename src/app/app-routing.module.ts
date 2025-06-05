@@ -4,9 +4,13 @@ import { RouterModule, Routes } from '@angular/router';
 const routes: Routes = [
   {
     path: 'Book',
-    loadChildren:() => import('./Book/book-layout.module').then(module => module.BookLayoutModule)
+    loadChildren: () => import('./Book/book-layout.module').then(module => module.BookLayoutModule)
   },
-  {path: '', redirectTo: 'Book/Home', pathMatch: 'full'},
+  {
+    path: 'SpBook',
+    loadChildren: () => import('./SpBook/sp-book-layout.module').then(module => module.SpBookLayoutModule)
+  },
+  { path: '', redirectTo: 'Book/Home', pathMatch: 'full' },
 ];
 
 @NgModule({

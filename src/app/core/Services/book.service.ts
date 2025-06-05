@@ -110,8 +110,8 @@ export class BookService {
     });
   }
 
-  public getBookById(id: string): Promise<Response> {
-    return new Promise((resolve, reject) => {
+  async getBookById(id: string): Promise<Response> {
+    return await new Promise((resolve, reject) => {
       this.http.get<Response>(this.serviceurl + '/getBookById', { params: { id } }).subscribe({
         next: (value: Response) => {
           if (value.statusCode == 1) {
@@ -131,8 +131,8 @@ export class BookService {
     });
   }
 
-  public getData(): Promise<Response> {
-    return new Promise((resolve, reject) => {
+  async getData(): Promise<Response> {
+    return await new Promise((resolve, reject) => {
       this.http.get<Response>(this.serviceurl + '/getData').subscribe({
         next: (value: Response) => {
           if (value.statusCode == 1) {

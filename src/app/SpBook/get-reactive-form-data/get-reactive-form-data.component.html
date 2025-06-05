@@ -133,11 +133,11 @@
 
         <div class="card shadow-sm">
             <div class="card-body">
-                <div class="">
+                <div class="table-responsive">
                     <table class="table table-striped table-hover align-middle table-fixed">
                         <thead class="table-dark">
                             <tr>
-                                <th scope="col" >
+                                <th scope="col"  [style.width.px]="100">
                                     <i class="bi" *ngIf="sortColumn === 'Title'"
                                         [ngClass]="sortDirection === 'ASC' ? 'bi-sort-up' : 'bi-sort-down'"
                                         style="cursor:pointer" (click)="onSort('Title')">
@@ -146,8 +146,8 @@
                                         Title
                                     </span>
                                 </th>
-                                <th scope="col" [style.width.px]="300">Description</th>
-                                <th scope="col" [style.width.px]="100">
+                                <th scope="col"  [style.width.px]="300">Description</th>
+                                <th scope="col"  [style.width.px]="100">
                                     <i class="bi" *ngIf="sortColumn === 'NoOfPages'"
                                         [ngClass]="sortDirection === 'ASC' ? 'bi-sort-up' : 'bi-sort-down'"
                                         style="cursor:pointer" (click)="onSort('NoOfPages')">
@@ -156,7 +156,7 @@
                                         Pages
                                     </span>
                                 </th>
-                                <th scope="col" [style.width.px]="50">
+                                <th scope="col"  [style.width.px]="100">
                                     <i class="bi" *ngIf="sortColumn === 'Price'"
                                         [ngClass]="sortDirection === 'ASC' ? 'bi-sort-up' : 'bi-sort-down'"
                                         style="cursor:pointer" (click)="onSort('Price')">
@@ -165,7 +165,7 @@
                                         Price
                                     </span>
                                 </th>
-                                <th scope="col"  [style.width.px]="120">
+                                <th scope="col"  [style.width.px]="120"> 
                                     <i class="bi" *ngIf="sortColumn === 'Language'"
                                         [ngClass]="sortDirection === 'ASC' ? 'bi-sort-up' : 'bi-sort-down'"
                                         style="cursor:pointer" (click)="onSort('Language')">
@@ -174,7 +174,7 @@
                                         Language
                                     </span>
                                 </th>
-                                <th scope="col">
+                                <th scope="col"  [style.width.px]="150">
                                     <i class="bi" *ngIf="sortColumn === 'Author'"
                                         [ngClass]="sortDirection === 'ASC' ? 'bi-sort-up' : 'bi-sort-down'"
                                         style="cursor:pointer" (click)="onSort('Author')">
@@ -183,17 +183,9 @@
                                         Author
                                     </span>
                                 </th>
-                                <th scope="col">Category</th>
-                                <th scope="col" [style.width.px]="120">
-                                    <i class="bi" *ngIf="sortColumn === 'Publication'"
-                                        [ngClass]="sortDirection === 'ASC' ? 'bi-sort-up' : 'bi-sort-down'"
-                                        style="cursor:pointer" (click)="onSort('Publication')">
-                                    </i>
-                                    <span (click)="onSort('Publication')" style="cursor:pointer" >
-                                        Publisher
-                                    </span>
-                                </th>
-                                <th scope="col">Action</th>
+                                <th scope="col" [style.width.px]="200" >Category</th>
+                                <th scope="col" [style.width.px]="120">Publisher</th>
+                                <th scope="col"  [style.width.px]="100">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -218,7 +210,7 @@
                                     <button mat-button color="primary" (click)="openBookDetails(item)">Details</button>
                                     <button mat-button color="warn" (click)="openDelteBook(item)">Delete</button>
                                     <button class="btn btn-sm btn-outline-primary"
-                                        [routerLink]="['/Book','editbook', item.id]">Edit</button>
+                                        [routerLink]="['/SpBook','editbook', item.id]">Edit</button>
                                 </td>
                             </tr>
                             <tr *ngIf="Books && Books.length === 0 && !loading">

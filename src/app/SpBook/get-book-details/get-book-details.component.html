@@ -1,0 +1,24 @@
+<p>Details page</p>
+<h2 mat-dialog-title>Book Details - {{ book.title }}</h2>
+
+<mat-dialog-content>
+  <mat-card>
+    <mat-card-content>
+      <p><strong>ID:</strong> {{ book.id }}</p>
+      <p><strong>Description:</strong> {{ book.description }}</p>
+      <p><strong>Pages:</strong> {{ book.pages }}</p>
+      <p><strong>Price:</strong> {{ book.price }}</p>
+      <p><strong>Language:</strong> {{ book.language }}</p>
+      <p><strong>Author:</strong> {{ book.author }}</p>
+      <p><strong>Publisher:</strong> {{ book.publisher }}</p>
+      <p><strong>Categories:</strong></p>
+      <div *ngFor="let cat of book.splitedCategories">
+        <mat-chip color="primary">{{ cat }}</mat-chip>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="dialogRef.close()">Close</button>
+</mat-dialog-actions>

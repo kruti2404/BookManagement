@@ -1,49 +1,41 @@
-import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BookService } from 'src/app/core/Services/book.service';
 import { Book } from 'src/app/Shared/Models/Book/Book.Module';
 import { Response } from './../../Shared/Models/Response/Response.Module'
 import { formatDate } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { SpBookServiceService } from 'src/app/core/Services/sp-book-service.service';
+
 @Component({
-  selector: 'app-create-reactiveform',
-  templateUrl: './create-reactiveform.component.html',
-  styleUrls: ['./create-reactiveform.component.css']
+  selector: 'app-create-reactive-form',
+  templateUrl: './create-reactive-form.component.html',
+  styleUrls: ['./create-reactive-form.component.css']
 })
-export class CreateReactiveformComponent implements OnInit {
+export class CreateReactiveFormComponent implements OnInit {
+
+
   loading: boolean = false;
   bookForm!: FormGroup;
   iseditMode!: boolean;
-  id: string|null = null;
+  id: string | null = null;
   formdata = new FormData();
-test:any[] = [];
-  Authors: string[] = [
-    'Ruskin Bond', 'Shashi Deshpande', 'Jhumpa Lahiri', 'Anukrti Upadhyay', 'Arundathi Roy', 'Rabindranath Tagore', 'Shubhangi Swarup',
-    'Neharika Gupta', 'Salman Rushdie', 'Madhuri Vijay', 'Vikram Seth', 'Rehana Munir', 'Khushwant Singh', 'Amitav Ghosh', 'Shuma Raha',
-    'Balli Kaur Jaswal', 'R.K. Narayan', 'Chitra Banerjee Divakaruni', 'Indu Sundaresan', 'Mulk Raj Anand'];
-  Categories: string[] = [
-    'Thriller', 'Romance novel', 'Autobiography', 'Young adult', 'Literary fiction', 'Humour',
-    'Classics', 'Comics', 'History', 'Horror', 'Fantasy', 'Business', 'Play', 'Historical fiction',
-    'Religion', 'Biography', 'Short story', 'Mystery', 'Adventure fiction', 'Poetry',];
-  Publishers: string[] = [
-    'Srishti Publishers', 'Jaico Publishing House', 'Notion publication', 'Rupa Publications', 'Hachette India', 'Penguin Random House',
-    'Leadstart Publishing', 'Roli Books', 'HarperCollins', 'Aleph Book Company',];
+  test: any[] = [];
+  Authors: string[] = [];
+  Categories: string[] = [];
+  Publishers: string[] = [];
   formSubmitted = false;
 
   constructor(
     private fb: FormBuilder,
     private bookService: BookService,
+    private SpBookService: SpBookServiceService,
     private route: ActivatedRoute,
     private router: Router
   ) { }
 
-  ngOnInit(): void {
-    this.test = [{id:12,name:'test',data:'01/25/2025'}]
-    this.test.forEach((att)=>{
-      att.tempdata = formatDate(att.data,'yyyy-mm-dd','en');
-    });
-
-   
+  async ngOnInit() {
+    await this.getDropdownData();
     this.id = this.route.snapshot.paramMap.get('id');
     this.iseditMode = !!this.id && this.id !== 'undefined' && this.id.trim() !== '';
 
@@ -58,8 +50,8 @@ test:any[] = [];
       publisher: ['', Validators.required]
     });
 
-    if (this.iseditMode) {
-      this.bookService.getBookById(this.id ?? '')
+    if (this.iseditMode && this.id !== null) {
+      await this.bookService.getBookById(this.id)
         .then((value: any) => {
           console.log("Success: ", value);
           this.title?.setValue(value.data.title);
@@ -71,8 +63,6 @@ test:any[] = [];
           this.publisher?.setValue(value.data.publisher);
           const categoriesArray: string[] = (value.data.categories as string).split(", ");
           this.categories?.setValue(categoriesArray);
-
-
         })
         .catch((err: any) => {
           console.error("Error: ", err);
@@ -91,9 +81,19 @@ test:any[] = [];
   get categories() { return this.bookForm.get('categories'); }
   get publisher() { return this.bookForm.get('publisher'); }
 
+  async getDropdownData() {
+    await this.bookService.getData()
+      .then((value: any) => {
+        this.Authors = value.data.author?.map((a: any) => a.name) || [];
+        this.Categories = value.data.category?.map((a: any) => a.name) || [];
+        this.Publishers = value.data.publisher?.map((a: any) => a.name) || [];
+      })
+      .catch((error: any) => {
+        console.error("Error fetching dropdown data: ", error);
+      });
+  }
 
-
-  submited() {
+  async submited() {
     this.loading = true;
     this.formSubmitted = true;
 
@@ -111,7 +111,8 @@ test:any[] = [];
 
 
       if (this.iseditMode) {
-        bookData.id = this.id!;
+        bookData.id = this.id ?? '';
+        bookData.formType = 'Reactive Form';
         console.log('Form Submitted! Data:', bookData);
         Object.entries(bookData).forEach(([key, value]) => {
           if (Array.isArray(value)) {
@@ -122,12 +123,9 @@ test:any[] = [];
         });
 
         console.log("EditMode is on");
-        this.editBook();
-
       }
       else {
         bookData.formType = 'Reactive Form';
-
         console.log('Form Submitted! Data:', bookData);
         Object.entries(bookData).forEach(([key, value]) => {
           if (Array.isArray(value)) {
@@ -136,21 +134,23 @@ test:any[] = [];
             this.formdata.append(key, value as string);
           }
         });
-        this.createBook();
       }
+
+      await this.CreateOrEdit();
+
     } else {
       console.log('Form is invalid. Please check the fields.');
       this.bookForm.markAllAsTouched();
     }
     this.loading = false;
     this.formSubmitted = false;
-    this.router.navigate(['/Book', 'Home']);
+    this.router.navigate(['/SpBook', 'Home']);
 
   }
 
-  createBook() {
+  async CreateOrEdit() {
 
-    this.bookService.createBook(this.formdata)
+    await this.SpBookService.creatOrEdit(this.formdata)
       .then((value: Response) => {
         console.log("Success:  ", value.message);
       })
@@ -160,15 +160,4 @@ test:any[] = [];
 
   }
 
-  editBook() {
-    this.bookService.editBook(this.formdata)
-      .then((value: any) => {
-        console.log("Success:  ", value.message);
-      })
-      .catch((error: any) => {
-        console.error("Error: ", error);
-      });
-  }
-
-  
 }

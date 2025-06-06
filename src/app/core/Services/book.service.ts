@@ -25,25 +25,17 @@ export class BookService {
           }
         },
         error: (err) => {
-          console.error("HTTP Error: ", err);
           reject(err);
-        },
-        complete: () => {
-          console.log("Request completed.");
         }
       });
     });
   }
 
-
   public createBook(createBook: FormData): Promise<Response> {
-    console.log("The data of book from the create page ", createBook);
     return new Promise((resolve, reject) => {
       return this.http.post<Response>(`${this.serviceurl}/createBook`, createBook).subscribe({
         next: (value: Response) => {
-          console.log("The data is ", value);
           if (value.statusCode == 0) {
-            console.log("The data successfully sumbmitted");
             resolve(value);
           }
           else {
@@ -52,25 +44,18 @@ export class BookService {
 
         },
         error: (err) => {
-          console.log("Error while executing the post request ", err);
           reject(err);
-        },
-        complete() {
-          console.log("Completed the post request ");
-        },
+        }
       });
     })
 
   }
 
   public editBook(editBook: FormData) {
-    console.log("The data of book from the create page ", FormData);
     return new Promise((resolve, reject) => {
       this.http.post<Response>(`${this.serviceurl}/editBook`, editBook).subscribe({
         next: (value) => {
-          console.log("Value is ", value);
           if (value.statusCode == 0) {
-            console.log("The data successfully sumbmitted");
             resolve(value);
           }
           else {
@@ -78,18 +63,13 @@ export class BookService {
           }
         },
         error: (err) => {
-          console.log("Error while executing the post request ", err);
           reject(err);
-        },
-        complete: () => {
-          console.log("Completed the post request ");
-        },
+        }
       })
     })
   }
 
   public deleteBook(id: string): Promise<Response> {
-    console.log("Service delteBook ", id);
 
     return new Promise((resolve, reject) => {
       this.http.post<Response>(this.serviceurl + '/deleteBook', { "id": id }, { headers: { 'Content-Type': 'application/json' } }).subscribe({
@@ -100,12 +80,8 @@ export class BookService {
           reject(value.message);
         },
         error: (err) => {
-          console.error("HTTP Error: ", err);
           reject(err);
-        },
-        complete: () => {
-          console.log("Request completed.");
-        },
+        }
       })
     });
   }
@@ -121,11 +97,7 @@ export class BookService {
           }
         },
         error: (err) => {
-          console.error("HTTP Error: ", err);
           reject(err);
-        },
-        complete: () => {
-          console.log("Request completed.");
         }
       });
     });
@@ -142,11 +114,7 @@ export class BookService {
           }
         },
         error: (err) => {
-          console.error("HTTP Error: ", err);
           reject(err);
-        },
-        complete: () => {
-          console.log("Request completed.");
         }
       });
     });
@@ -160,13 +128,10 @@ export class BookService {
       paramsObj[key] = value.toString();
     });
 
-    console.log("The data of book from the create page ", paramsObj);
     return new Promise((resolve, reject) => {
       this.http.get<Response>(`${this.serviceurl}/filterData`, { params: paramsObj }).subscribe({
         next: (value) => {
-          console.log("Value is ", value);
           if (value.statusCode == 0) {
-            console.log("The data successfully sumbmitted");
             resolve(value);
           }
           else {
@@ -174,12 +139,8 @@ export class BookService {
           }
         },
         error: (err) => {
-          console.log("Error while executing the post request ", err);
           reject(err);
-        },
-        complete: () => {
-          console.log("Completed the post request ");
-        },
+        }
       })
     })
   }

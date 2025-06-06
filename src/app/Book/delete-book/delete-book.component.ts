@@ -23,8 +23,6 @@ export class DeleteBookComponent {
   ) { }
 
   deleteBook(id: string) {
-    console.log("Delete request");
-    console.log(id);
     this.loading = true;
     this.bookservice.deleteBook(id)
       .then((value: Response) => {

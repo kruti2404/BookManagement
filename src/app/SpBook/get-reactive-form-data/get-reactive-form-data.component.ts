@@ -6,7 +6,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { FormControl, FormGroup } from '@angular/forms';
 import { PageEvent } from '@angular/material/paginator';
 import { SpBookServiceService } from 'src/app/core/Services/sp-book-service.service';
-import { Response } from 'src/app/Shared/Models/Response/Response.Module';
 import { GetBookDetailsComponent } from '../get-book-details/get-book-details.component';
 import { DeleteBookComponent } from '../delete-book/delete-book.component';
 

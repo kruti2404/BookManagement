@@ -3,7 +3,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BookService } from 'src/app/core/Services/book.service';
 import { Book } from 'src/app/Shared/Models/Book/Book.Module';
 import { Response } from './../../Shared/Models/Response/Response.Module'
-import { formatDate } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { SpBookServiceService } from 'src/app/core/Services/sp-book-service.service';
 
@@ -53,7 +52,6 @@ export class CreateReactiveFormComponent implements OnInit {
     if (this.iseditMode && this.id !== null) {
       await this.bookService.getBookById(this.id)
         .then((value: any) => {
-          console.log("Success: ", value);
           this.title?.setValue(value.data.title);
           this.description?.setValue(value.data.description);
           this.pages?.setValue(value.data.pages);
@@ -66,7 +64,6 @@ export class CreateReactiveFormComponent implements OnInit {
         })
         .catch((err: any) => {
           console.error("Error: ", err);
-
         });
     }
 
@@ -113,7 +110,6 @@ export class CreateReactiveFormComponent implements OnInit {
       if (this.iseditMode) {
         bookData.id = this.id ?? '';
         bookData.formType = 'Reactive Form';
-        console.log('Form Submitted! Data:', bookData);
         Object.entries(bookData).forEach(([key, value]) => {
           if (Array.isArray(value)) {
             this.formdata.append(key, value.join(', '));
@@ -122,11 +118,9 @@ export class CreateReactiveFormComponent implements OnInit {
           }
         });
 
-        console.log("EditMode is on");
       }
       else {
         bookData.formType = 'Reactive Form';
-        console.log('Form Submitted! Data:', bookData);
         Object.entries(bookData).forEach(([key, value]) => {
           if (Array.isArray(value)) {
             this.formdata.append(key, value.join(', '));
@@ -145,7 +139,6 @@ export class CreateReactiveFormComponent implements OnInit {
     this.loading = false;
     this.formSubmitted = false;
     this.router.navigate(['/SpBook', 'Home']);
-
   }
 
   async CreateOrEdit() {

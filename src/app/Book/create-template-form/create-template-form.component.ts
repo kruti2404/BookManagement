@@ -77,7 +77,6 @@ export class CreateTemplateFormComponent implements OnInit {
       bookData.publisher = this.bookModel.publisher;
       bookData.splitedCategories = [...this.bookModel.categories];
 
-      console.log('Form Submitted! Data:', bookData);
 
       const formdata = new FormData();
       Object.entries(bookData).forEach(([key, value]) => {
@@ -97,10 +96,7 @@ export class CreateTemplateFormComponent implements OnInit {
         })
       this.formSubmitted = false;
 
-    } else {
-      console.log('Form is invalid. Please check the fields.');
-
-    }
+    } 
   }
 
 }

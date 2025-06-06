@@ -7,7 +7,6 @@ import { Book } from 'src/app/Shared/Models/Book/Book.Module';
 import { NgForm } from '@angular/forms';
 import { PageEvent } from '@angular/material/paginator';
 import { SpBookServiceService } from 'src/app/core/Services/sp-book-service.service';
-import { waitForAsync } from '@angular/core/testing';
 import { DeleteBookComponent } from '../delete-book/delete-book.component';
 import { GetBookDetailsComponent } from '../get-book-details/get-book-details.component';
 

@@ -14,9 +14,8 @@ export class CreateReactiveformComponent implements OnInit {
   loading: boolean = false;
   bookForm!: FormGroup;
   iseditMode!: boolean;
-  id: string|null = null;
+  id: string | null = null;
   formdata = new FormData();
-test:any[] = [];
   Authors: string[] = [
     'Ruskin Bond', 'Shashi Deshpande', 'Jhumpa Lahiri', 'Anukrti Upadhyay', 'Arundathi Roy', 'Rabindranath Tagore', 'Shubhangi Swarup',
     'Neharika Gupta', 'Salman Rushdie', 'Madhuri Vijay', 'Vikram Seth', 'Rehana Munir', 'Khushwant Singh', 'Amitav Ghosh', 'Shuma Raha',
@@ -38,12 +37,6 @@ test:any[] = [];
   ) { }
 
   ngOnInit(): void {
-    this.test = [{id:12,name:'test',data:'01/25/2025'}]
-    this.test.forEach((att)=>{
-      att.tempdata = formatDate(att.data,'yyyy-mm-dd','en');
-    });
-
-   
     this.id = this.route.snapshot.paramMap.get('id');
     this.iseditMode = !!this.id && this.id !== 'undefined' && this.id.trim() !== '';
 
@@ -112,7 +105,6 @@ test:any[] = [];
 
       if (this.iseditMode) {
         bookData.id = this.id!;
-        console.log('Form Submitted! Data:', bookData);
         Object.entries(bookData).forEach(([key, value]) => {
           if (Array.isArray(value)) {
             this.formdata.append(key, value.join(', '));
@@ -121,14 +113,12 @@ test:any[] = [];
           }
         });
 
-        console.log("EditMode is on");
         this.editBook();
 
       }
       else {
         bookData.formType = 'Reactive Form';
 
-        console.log('Form Submitted! Data:', bookData);
         Object.entries(bookData).forEach(([key, value]) => {
           if (Array.isArray(value)) {
             this.formdata.append(key, value.join(', '));
@@ -170,5 +160,5 @@ test:any[] = [];
       });
   }
 
-  
+
 }

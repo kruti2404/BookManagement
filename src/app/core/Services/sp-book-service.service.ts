@@ -8,52 +8,41 @@ import { environment } from 'src/environments/environment';
 })
 export class SpBookServiceService {
 
-   constructor(
-      private http: HttpClient
-    ) { }
-    private baseUrl = environment.baseurl;
-    private serviceurl = this.baseUrl + '/api/SpBook';
-  
+  constructor(
+    private http: HttpClient
+  ) { }
+  private baseUrl = environment.baseurl;
+  private serviceurl = this.baseUrl + '/api/SpBook';
 
-   async FilterBook(filterBook: FormData) {
-      const paramsObj: { [key: string]: string } = {};
-      filterBook.forEach((value, key) => {
-        paramsObj[key] = value.toString();
-      });
-      
-  
-      console.log("The data of book from the create page ", paramsObj);
-       return await new Promise((resolve, reject) => {
-        this.http.get<Response>(`${this.serviceurl}/filterData`, { params: paramsObj }).subscribe({
-          next: (value : Response) => {
-            console.log("Value is ", value);
-            if (value.statusCode == 0) {
-              console.log("The data successfully sumbmitted");
-              resolve(value);
-            }
-            else {
-              reject(value);
-            }
-          },
-          error: (err) => {
-            console.log("Error while executing the post request ", err);
-            reject(err);
-          },
-          complete: () => {
-            console.log("Completed the post request ");
-          },
-        })
+
+  async FilterBook(filterBook: FormData) {
+    const paramsObj: { [key: string]: string } = {};
+    filterBook.forEach((value, key) => {
+      paramsObj[key] = value.toString();
+    });
+
+    return await new Promise((resolve, reject) => {
+      this.http.get<Response>(`${this.serviceurl}/filterData`, { params: paramsObj }).subscribe({
+        next: (value: Response) => {
+          if (value.statusCode == 0) {
+            resolve(value);
+          }
+          else {
+            reject(value);
+          }
+        },
+        error: (err) => {
+          reject(err);
+        }
       })
-    }
-  
-    async creatOrEdit(Book: FormData): Promise<Response> {
-    console.log("The data of book from the create page ", Book);
+    })
+  }
+
+  async creatOrEdit(Book: FormData): Promise<Response> {
     return await new Promise((resolve, reject) => {
       return this.http.post<Response>(`${this.serviceurl}/createOrEdit`, Book).subscribe({
         next: (value: Response) => {
-          console.log("The data is ", value);
           if (value.statusCode == 0) {
-            console.log("The data successfully sumbmitted");
             resolve(value);
           }
           else {
@@ -62,12 +51,8 @@ export class SpBookServiceService {
 
         },
         error: (err) => {
-          console.log("Error while executing the post request ", err);
           reject(err);
-        },
-        complete() {
-          console.log("Completed the post request ");
-        },
+        }
       });
     })
 

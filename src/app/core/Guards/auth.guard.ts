@@ -22,7 +22,6 @@ export class AuthGuard implements CanActivate {
     
     this.isLoggedIn = this.authService.isLoggedIn;
     if (this.isLoggedIn) {
-      this.toaster.success("You are allowed to access this page ", "Success");
       return true;
     } else {
       this.toaster.error("You are not allowed to access this page please Login", "Error")

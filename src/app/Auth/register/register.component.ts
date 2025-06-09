@@ -34,7 +34,7 @@ export class RegisterComponent {
       })
       .catch((error: any) => {
         console.error("Error fetching registering User: ", error);
-        this.toasterService.error(error.message, `Error ${error.status}`);
+        this.toasterService.error(error.data, "Error");
       });
 
       this.registerData = new FormData();

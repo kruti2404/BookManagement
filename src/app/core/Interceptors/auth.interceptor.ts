@@ -6,36 +6,44 @@ import {
   HttpInterceptor,
   HttpErrorResponse
 } from '@angular/common/http';
-import { catchError, Observable, throwError } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { AuthService } from '../Services/auth.service';
+import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
 
   constructor(
-    private authService: AuthService
-  ) { }
+    private authService: AuthService,
+    private route: Router,
+    private toster : ToastrService
+  ) {}
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    var loginStatus = this.authService.isLoggedIn;
+    const loginStatus = this.authService.isLoggedIn;
+    let authRequest = request;
 
     if (loginStatus) {
-      var token = this.authService.getToken();
+      const token = this.authService.getToken();
+      console.log(token);
 
-      if (token) {
-        const modifiedReq = request.clone({
-          setHeaders: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        console.log("AuthInterceptor: Sending modified request with token:");
+      authRequest = request.clone({
+        setHeaders: {
+          Authorization: `Bearer ${token}`
+        }
+      });
 
-        return next.handle(modifiedReq).pipe(
-          catchError((error: HttpErrorResponse) => {
-            if (error.status === 401) {
-              console.warn("Access token might be expired. Trying refresh token...");
+      return new Observable<HttpEvent<unknown>>(observer => {
+        next.handle(authRequest).subscribe({
+          next: (event) => observer.next(event),
+          error: (error: HttpErrorResponse) => {
+            console.log(error);
+            if (error.status === 401 && error.headers.get('Token-Expired') === 'true') {
+              console.warn('Access token is expired and refreshing the token');
 
-              return this.authService.refreshToken().then((refreshResult) => {
+              this.authService.refreshToken().then(() => {
                 const newAccessToken = localStorage.getItem('AccessToken');
                 const retriedRequest = request.clone({
                   setHeaders: {
@@ -43,22 +51,37 @@ export class AuthInterceptor implements HttpInterceptor {
                   }
                 });
 
-                return next.handle(retriedRequest).toPromise();
+                next.handle(retriedRequest).subscribe({
+                  next: (retriedEvent) => observer.next(retriedEvent),
+                  error: (refreshErr) => {
+                    console.error("Refresh token failed", refreshErr);
+                    this.authService.logout();
+                    this.route.navigate(['/Auth']);
+                    observer.error(refreshErr);
+                  },
+                  complete: () => observer.complete()
+                });
               }).catch(err => {
                 console.error("Refresh token failed", err);
-                this.authService.logout(); 
-                return throwError(() => err);
+                this.authService.logout();
+                this.route.navigate(['/Auth']);
+                observer.error(err);
               });
-            } else {
-              return throwError(() => error);
-            }
-          }) as any
-        );
 
-      } else {
-        console.warn("AuthInterceptor: User is logged in, but no token found. Sending original request.");
-      }
+            } else {
+              this.toster.error("You are not authorized to access the request", "UnAuthorized")
+              console.log("You are not Authorized")
+              this.authService.logout();
+                this.route.navigate(['/Auth']);
+              observer.error(error);
+            }
+          },
+          complete: () => observer.complete()
+        });
+      });
+
+    } else {
+      return next.handle(request);
     }
-    return next.handle(request);
   }
 }

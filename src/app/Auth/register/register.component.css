@@ -85,3 +85,7 @@
     gap: 0;
   }
 }
+.anchor{
+  width: auto;
+  margin: 0 150px 0 0;
+}

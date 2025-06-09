@@ -11,7 +11,7 @@ import { Response } from 'src/app/Shared/Models/Response/Response.Module';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-
+  loading: boolean = false;
   user: any = '';
   loginForm!: FormGroup;
   loginData: FormData = new FormData();
@@ -27,10 +27,6 @@ export class LoginComponent {
     if (login) {
       this.route.navigateByUrl('Book/Home');
     }
-    else {
-      console.log("User is not logged in.");
-    }
-
     this.loginForm = this.fb.group({
       username: ['', Validators.required],
       password: ['', [Validators.required, Validators.minLength(8)]],
@@ -45,6 +41,7 @@ export class LoginComponent {
 
 
       console.log("The formData is ", this.loginForm.value);
+      this.loading = true;
       await this.authService.Login(this.loginData)
         .then((value: any) => {
           console.log("Login is successfull with the response as ", value);
@@ -54,9 +51,9 @@ export class LoginComponent {
         })
         .catch((error: any | Response) => {
           console.error("Error fetching registering User: ", error);
-          this.toasterService.error(error.message, `Error`);
+          this.toasterService.error(error.data, `Error`);
         });
-
+      this.loading = false;
       this.loginData = new FormData();
     }
   }

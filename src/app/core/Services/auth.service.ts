@@ -85,7 +85,6 @@ export class AuthService {
     })
   }
 
-
   async Login(login: FormData): Promise<Response> {
     const username = login.get('username') as string;
 
@@ -120,12 +119,14 @@ export class AuthService {
 
   logout(): void {
     localStorage.removeItem('AccessToken');
+    localStorage.removeItem('RefreshToken');
+    localStorage.removeItem('UserName');
     this.currentUserSubject.next(null);
     this.isLoggedInSubject.next(false);
   }
 
   public getToken(): any {
-    return this.currentUserSubject.value;
+    return localStorage.getItem("AccessToken");
   }
   get isLoggedIn(): boolean {
     return this.isLoggedInSubject.value;

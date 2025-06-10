@@ -51,7 +51,7 @@ export class LoginComponent {
         })
         .catch((error: any | Response) => {
           console.error("Error fetching registering User: ", error);
-          this.toasterService.error(error.data, `Error`);
+          this.toasterService.error(error.data || error.message, `Error`);
         });
       this.loading = false;
       this.loginData = new FormData();

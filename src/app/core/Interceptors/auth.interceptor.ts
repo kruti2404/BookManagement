@@ -1,3 +1,5 @@
+import { from, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import {
   HttpRequest,
@@ -18,70 +20,65 @@ export class AuthInterceptor implements HttpInterceptor {
   constructor(
     private authService: AuthService,
     private route: Router,
-    private toster : ToastrService
-  ) {}
+    private toster: ToastrService
+  ) { }
 
+  refreshCounter = 0;
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     const loginStatus = this.authService.isLoggedIn;
     let authRequest = request;
 
     if (loginStatus) {
       const token = this.authService.getToken();
-      console.log(token);
-
       authRequest = request.clone({
         setHeaders: {
           Authorization: `Bearer ${token}`
         }
       });
+      return next.handle(authRequest).pipe(catchError(x => this.handleAuthError(x, request, next)));
+    }
+    return next.handle(request);
+  }
 
-      return new Observable<HttpEvent<unknown>>(observer => {
-        next.handle(authRequest).subscribe({
-          next: (event) => observer.next(event),
-          error: (error: HttpErrorResponse) => {
-            console.log(error);
-            if (error.status === 401 && error.headers.get('Token-Expired') === 'true') {
-              console.warn('Access token is expired and refreshing the token');
+  private handleAuthError(err: HttpErrorResponse,
+    originalRequest: HttpRequest<any>,
+    next: HttpHandler): Observable<any> {
+    if (err && err.status === 401 && err.headers.get('Token-Expired') === 'true' && this.refreshCounter !== 1) {
+      this.refreshCounter++;
 
-              this.authService.refreshToken().then(() => {
-                const newAccessToken = localStorage.getItem('AccessToken');
-                const retriedRequest = request.clone({
-                  setHeaders: {
-                    Authorization: `Bearer ${newAccessToken}`
-                  }
-                });
+      return from(this.authService.refreshToken()).pipe(
+        switchMap(() => {
+          const newAccessToken = localStorage.getItem('AccessToken');
+          if (newAccessToken) {
+            this.refreshCounter = 0;
 
-                next.handle(retriedRequest).subscribe({
-                  next: (retriedEvent) => observer.next(retriedEvent),
-                  error: (refreshErr) => {
-                    console.error("Refresh token failed", refreshErr);
-                    this.authService.logout();
-                    this.route.navigate(['/Auth']);
-                    observer.error(refreshErr);
-                  },
-                  complete: () => observer.complete()
-                });
-              }).catch(err => {
-                console.error("Refresh token failed", err);
-                this.authService.logout();
-                this.route.navigate(['/Auth']);
-                observer.error(err);
-              });
+            const authRequest = originalRequest.clone({
+              setHeaders: {
+                Authorization: `Bearer ${newAccessToken}`
+              }
+            });
 
-            } else {
-              this.toster.error("You are not authorized to access the request", "UnAuthorized")
-              console.log("You are not Authorized")
-              this.authService.logout();
-                this.route.navigate(['/Auth']);
-              observer.error(error);
-            }
-          },
-          complete: () => observer.complete()
-        });
-      });
-
+            return next.handle(authRequest);
+          } else {
+            this.toster.error('Session expired, please login again');
+            this.authService.logout();
+            this.route.navigate(['/Auth']);
+            return throwError(() => new Error('No new access token available'));
+          }
+        }),
+        catchError(refreshError => {
+          console.error('Token refresh failed', refreshError);
+          this.toster.error(refreshError.message, "Session Expired");
+          this.authService.logout();
+          this.route.navigate(['/Auth']);
+          return throwError(() => new Error('Refresh token failed'));
+        })
+      );
     } else {
-      return next.handle(request);
+      this.refreshCounter = 0;
+      this.authService.logout();
+      this.route.navigate(['/Auth']);
+      return throwError(() => err);
     }
   }
 }

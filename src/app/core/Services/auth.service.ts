@@ -36,7 +36,6 @@ export class AuthService {
       return this.http.post<Response>(`${this.serviceurl}/register`, register).subscribe({
         next: (value: Response) => {
           if (value.statusCode == 0) {
-            this.toaster.success("The user is successfully Registered")
             resolve(value);
           }
           else {
@@ -44,7 +43,6 @@ export class AuthService {
           }
         },
         error: (err) => {
-          this.toaster.error(`Error while executing the post request ${err.message}`)
           reject(err);
         },
         complete() {

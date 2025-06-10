@@ -1,8 +1,9 @@
-<div *ngIf="loading" class="form-container">
-  Please Wait Loading...
+<div *ngIf="loading" class="loader-wrapper">
+  <div class="spinner"></div>
+  <div class="loading-text">Signing you up...</div>
 </div>
 
-<div *ngIf="!loading" class="form-container">
+<div class="form-container">
   <form #registrationForm="ngForm" (ngSubmit)="onSubmit(registrationForm)" class="form-signin login-form">
     <h3 class="txt-color-mg">Sign Up</h3>
     <div class="d-flex flex-row gap-2">

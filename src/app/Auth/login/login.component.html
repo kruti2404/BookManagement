@@ -4,7 +4,7 @@
 </div>
 
 
-<div *ngIf="!loading" class="form-container">
+<div class="form-container">
   <form class="form-signin login-form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
     <h3 class="txt-color-mg">Sign In</h3>
 
@@ -29,7 +29,6 @@
       </div>
     </div>
 
-    <!-- Footer: New user + Button -->
     <div class="row">
       <div class="col-8 mt-2 anchor" routerLink="/Auth/Register">New User?</div>
       <div class="col-4">

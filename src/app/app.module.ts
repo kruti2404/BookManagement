@@ -18,9 +18,10 @@ import { AuthInterceptor } from './core/Interceptors/auth.interceptor';
     HttpClientModule,
     AppRoutingModule,
     ToastrModule.forRoot({
-      timeOut: 15000, 
+      timeOut: 5000, 
       closeButton: true,
       progressBar: true,
+      easeTime: 100
     }),
     
   ],

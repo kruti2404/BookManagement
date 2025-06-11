@@ -6,6 +6,7 @@ import { GetBookDetailsComponent } from '../get-book-details/get-book-details.co
 import { DeleteBookComponent } from '../delete-book/delete-book.component';
 import { NgForm } from '@angular/forms';
 import { PageEvent } from '@angular/material/paginator';
+import { DatatransferService } from 'src/app/core/Services/datatransfer.service';
 
 @Component({
   selector: 'app-get-template-driven-form-book',
@@ -16,6 +17,7 @@ export class GetTemplateDrivenFormBookComponent implements OnInit {
 
   constructor(
     private bookService: BookService,
+    private datatransferService :DatatransferService,
     private dialog: MatDialog
   ) { }
 
@@ -55,8 +57,8 @@ export class GetTemplateDrivenFormBookComponent implements OnInit {
     this.getfilteredResult();
   }
 
-  getDropdownData(): void {
-    this.bookService.getData()
+  async getDropdownData() {
+    await this.datatransferService.getDropDownData()
       .then((value: any) => {
         this.Authors = value.data.author || [];
         this.Categories = value.data.category || [];

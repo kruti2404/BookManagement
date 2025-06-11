@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, catchError, filter, Observable, take, tap, throwError } from 'rxjs';
 import { Response } from 'src/app/Shared/Models/Response/Response.Module';
 import { environment } from 'src/environments/environment';
 
@@ -16,9 +16,12 @@ export class AuthService {
   private isLoggedInSubject = new BehaviorSubject<boolean>(false);
   public isLoggedIn$ = this.isLoggedInSubject.asObservable();
 
+  private refreshInProgress = false;
+  private refreshTokenSubject = new BehaviorSubject<string | null>(null);
+
   constructor(
     private http: HttpClient,
-    private toaster : ToastrService
+    private toaster: ToastrService
   ) {
     const savedUser = localStorage.getItem('AccessToken');
     if (savedUser != null) {
@@ -53,34 +56,38 @@ export class AuthService {
 
   }
 
-  async refreshToken(): Promise<any> {
-    const refreshToken = localStorage.getItem('RefreshToken');
-    const username = localStorage.getItem('UserName');
+  refreshToken(): Observable<any> {
+    if (this.refreshInProgress) {
+      return this.refreshTokenSubject.asObservable().pipe(
+        filter(token => token !== null),
+        take(1)
+      );
+    } else {
+      this.refreshInProgress = true;
+      const refreshToken = localStorage.getItem('RefreshToken');
+      const username = localStorage.getItem('UserName');
 
-    if (!refreshToken || !username) {
-      throw new Error('Missing refresh token or Username');
+      const body = { username, refreshToken };
+      
+      return this.http.post<any>(`${this.serviceurl}/refresh-token`, body).pipe(
+        tap(response => {
+          if (response.statusCode === 0) {
+            this.SetToken(response.data, username || '');
+            this.refreshTokenSubject.next(response.data.accessToken);
+          } else {
+            this.logout();
+            this.refreshTokenSubject.next(null);
+          }
+          this.refreshInProgress = false;
+        }),
+        catchError(err => {
+          this.logout();
+          this.refreshInProgress = false;
+          this.refreshTokenSubject.next(null);
+          return throwError(() => err);
+        })
+      );
     }
-
-    const body = {
-      username: username,
-      refreshToken: refreshToken
-    };
-    return await new Promise((resolve, reject) => {
-      return this.http.post<any>(`${this.serviceurl}/refresh-token`, body).subscribe({
-        next: (value) => {
-          if (value.statusCode == 0) {
-            this.SetToken(value.data, username);
-            resolve(value);
-          }
-          else {
-            reject(value);
-          }
-        },
-        error: (err) => {
-          this.toaster.error(err.message, "Error");
-        }
-      })
-    })
   }
 
   async Login(login: FormData): Promise<Response> {
@@ -109,7 +116,7 @@ export class AuthService {
     const RefreshToken = tokens.refreshToken;
     localStorage.setItem('AccessToken', accessToken);
     localStorage.setItem('RefreshToken', RefreshToken);
-    localStorage.setItem('UserName', username); 
+    localStorage.setItem('UserName', username);
 
     this.currentUserSubject.next(accessToken);
     this.isLoggedInSubject.next(true);

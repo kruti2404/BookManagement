@@ -5,6 +5,7 @@ import { BookService } from 'src/app/core/Services/book.service';
 import { Book } from 'src/app/Shared/Models/Book/Book.Module';
 import { Response } from './../../Shared/Models/Response/Response.Module'
 import { SpBookServiceService } from 'src/app/core/Services/sp-book-service.service';
+import { DatatransferService } from 'src/app/core/Services/datatransfer.service';
 interface BookFormModel {
   title: string;
   description: string;
@@ -42,6 +43,7 @@ export class CreateTemplateDrivenFormComponent implements OnInit {
 
   constructor(
     private bookService: BookService,
+    private dataTransferService : DatatransferService,
     private SpBookService : SpBookServiceService
   ) { }
 
@@ -50,7 +52,7 @@ export class CreateTemplateDrivenFormComponent implements OnInit {
   }
 
   async getDropdownData() {
-    await this.bookService.getData()
+    await this.dataTransferService.getDropDownData()
       .then((value: any) => {
         this.Authors = value.data.author || [];
         this.Categories = value.data.category || [];

@@ -2,6 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { BookService } from 'src/app/core/Services/book.service';
+import { DatatransferService } from 'src/app/core/Services/datatransfer.service';
 import { Book } from 'src/app/Shared/Models/Book/Book.Module';
 import { Response } from 'src/app/Shared/Models/Response/Response.Module';
 
@@ -20,6 +21,7 @@ export class DeleteBookComponent {
       public dialogRef: MatDialogRef<DeleteBookComponent>,
       @Inject(MAT_DIALOG_DATA) public book: Book,
       private bookservice: BookService,
+      private datatTransaferService: DatatransferService,
       private router: Router
     ) { }
   
@@ -32,6 +34,7 @@ export class DeleteBookComponent {
           console.log("Success:  ", value.message);
           this.loading = false;
           this.dialogRef.close()
+          this.datatTransaferService.setBookModified();
           this.router.navigate([ 'Book', 'Home' ]);
         })
         .catch((err: any) => {

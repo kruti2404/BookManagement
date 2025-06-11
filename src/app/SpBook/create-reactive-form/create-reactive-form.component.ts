@@ -1,10 +1,10 @@
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BookService } from 'src/app/core/Services/book.service';
 import { Book } from 'src/app/Shared/Models/Book/Book.Module';
 import { Response } from './../../Shared/Models/Response/Response.Module'
 import { Component, OnInit } from '@angular/core';
 import { SpBookServiceService } from 'src/app/core/Services/sp-book-service.service';
+import { DatatransferService } from 'src/app/core/Services/datatransfer.service';
 
 @Component({
   selector: 'app-create-reactive-form',
@@ -27,8 +27,8 @@ export class CreateReactiveFormComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private bookService: BookService,
     private SpBookService: SpBookServiceService,
+    private dataTransferService : DatatransferService,
     private route: ActivatedRoute,
     private router: Router
   ) { }
@@ -50,7 +50,7 @@ export class CreateReactiveFormComponent implements OnInit {
     });
 
     if (this.iseditMode && this.id !== null) {
-      await this.bookService.getBookById(this.id)
+      await this.dataTransferService.getBookById(this.id)
         .then((value: any) => {
           this.title?.setValue(value.data.title);
           this.description?.setValue(value.data.description);
@@ -79,7 +79,7 @@ export class CreateReactiveFormComponent implements OnInit {
   get publisher() { return this.bookForm.get('publisher'); }
 
   async getDropdownData() {
-    await this.bookService.getData()
+    await this.dataTransferService.getDropDownData()
       .then((value: any) => {
         this.Authors = value.data.author?.map((a: any) => a.name) || [];
         this.Categories = value.data.category?.map((a: any) => a.name) || [];
@@ -146,6 +146,7 @@ export class CreateReactiveFormComponent implements OnInit {
     await this.SpBookService.creatOrEdit(this.formdata)
       .then((value: Response) => {
         console.log("Success:  ", value.message);
+        this.dataTransferService.setBookModified();
       })
       .catch((error: any) => {
         console.error("Error: ", error);

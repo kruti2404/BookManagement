@@ -4,6 +4,7 @@ import { BookService } from 'src/app/core/Services/book.service';
 import { Book } from 'src/app/Shared/Models/Book/Book.Module';
 import { Response } from './../../Shared/Models/Response/Response.Module'
 import { Router } from '@angular/router';
+import { DatatransferService } from 'src/app/core/Services/datatransfer.service';
 
 @Component({
   selector: 'app-delete-book',
@@ -19,6 +20,7 @@ export class DeleteBookComponent {
     public dialogRef: MatDialogRef<DeleteBookComponent>,
     @Inject(MAT_DIALOG_DATA) public book: Book,
     private bookservice: BookService,
+    private datatransferService : DatatransferService,
     private router: Router
   ) { }
 
@@ -28,6 +30,7 @@ export class DeleteBookComponent {
       .then((value: Response) => {
         console.log("Success:  ", value.message);
         this.loading = false;
+        this.datatransferService.setBookModified();
         this.dialogRef.close()
         this.router.navigate([ 'Book', 'Home' ]);
       })

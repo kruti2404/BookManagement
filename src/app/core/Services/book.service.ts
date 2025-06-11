@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
 import { Response } from 'src/app/Shared/Models/Response/Response.Module';
 import { environment } from 'src/environments/environment';
 
@@ -52,7 +51,7 @@ export class BookService {
 
   }
 
-  public editBook(editBook: FormData) {
+  public editBook(editBook: FormData) :Promise<any> {
     return new Promise((resolve, reject) => {
       this.http.post<Response>(`${this.serviceurl}/editBook`, editBook).subscribe({
         next: (value) => {
@@ -87,42 +86,6 @@ export class BookService {
       })
     });
   }
-
-  async getBookById(id: string): Promise<Response> {
-    return await new Promise((resolve, reject) => {
-      this.http.get<Response>(this.serviceurl + '/getBookById', { params: { id } }).subscribe({
-        next: (value: Response) => {
-          if (value.statusCode == 1) {
-            reject(value.message);
-          } else {
-            resolve(value);
-          }
-        },
-        error: (err) => {
-          reject(err);
-        }
-      });
-    });
-  }
-
-  async getData(): Promise<Response> {
-    return await new Promise((resolve, reject) => {
-      this.http.get<Response>(this.serviceurl + '/getData').subscribe({
-        next: (value: Response) => {
-          if (value.statusCode == 1) {
-            reject(value.message);
-          } else {
-            resolve(value);
-          }
-        },
-        error: (err) => {
-          reject(err);
-        }
-      });
-    });
-  }
-
-
 
   public FilterBook(filterBook: FormData) {
     const paramsObj: { [key: string]: string } = {};

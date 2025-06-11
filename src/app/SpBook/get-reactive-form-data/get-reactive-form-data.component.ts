@@ -8,6 +8,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { SpBookServiceService } from 'src/app/core/Services/sp-book-service.service';
 import { GetBookDetailsComponent } from '../get-book-details/get-book-details.component';
 import { DeleteBookComponent } from '../delete-book/delete-book.component';
+import { DatatransferService } from 'src/app/core/Services/datatransfer.service';
 
 interface AppliedFilterItem {
   column: string;
@@ -25,6 +26,7 @@ export class GetReactiveFormDataComponent implements OnInit {
   constructor(
     private bookService: BookService,
     private SpBookService: SpBookServiceService,
+    private dataTransferService : DatatransferService,
     private dialog: MatDialog,
   ) { }
 
@@ -91,7 +93,7 @@ export class GetReactiveFormDataComponent implements OnInit {
     }
 
   async getDropdownData() {
-    await this.bookService.getData()
+    await this.dataTransferService.getDropDownData()
       .then((value: any) => {
         this.Authors = value.data.author || [];
         this.Categories = value.data.category || [];

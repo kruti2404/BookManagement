@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'; // Removed ElementRef, Renderer2
+import { Component, OnInit } from '@angular/core'; 
 import { BookService } from 'src/app/core/Services/book.service';
 import { Book } from 'src/app/Shared/Models/Book/Book.Module';
 import { GetBookDetailsComponent } from '../get-book-details/get-book-details.component';
@@ -6,6 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { DeleteBookComponent } from '../delete-book/delete-book.component';
 import { FormControl, FormGroup } from '@angular/forms';
 import { PageEvent } from '@angular/material/paginator';
+import { DatatransferService } from 'src/app/core/Services/datatransfer.service';
 
 interface AppliedFilterItem {
   column: string;
@@ -23,6 +24,7 @@ export class GetReactiveFormBookComponent implements OnInit {
   constructor(
     private bookService: BookService,
     private dialog: MatDialog,
+    private dataTransferService: DatatransferService
   ) { }
 
   loading: boolean = false;
@@ -90,9 +92,10 @@ export class GetReactiveFormBookComponent implements OnInit {
     });
   }
 
-  getDropdownData() {
-    this.bookService.getData()
+  async getDropdownData() {
+   await this.dataTransferService.getDropDownData()
       .then((value: any) => {
+        console.log("Dropdown data fetched successfully with datatransfer service:", value);
         this.Authors = value.data.author || [];
         this.Categories = value.data.category || [];
         this.Publishers = value.data.publisher || [];
@@ -151,7 +154,7 @@ export class GetReactiveFormBookComponent implements OnInit {
 
   clearAllFilters(): void {
     this.appliedFiltersArray = [];
-    this.Columns = [...this.allOriginalColumns]; 
+    this.Columns = [...this.allOriginalColumns];
     Object.keys(this.filterForm.controls).forEach(key => {
       const control = this.filterForm.get(key);
       if (key === 'Category') {
@@ -160,7 +163,7 @@ export class GetReactiveFormBookComponent implements OnInit {
         control?.reset();
       }
     });
-    this.getfilteredResult(); 
+    this.getfilteredResult();
   }
 
 
@@ -187,6 +190,7 @@ export class GetReactiveFormBookComponent implements OnInit {
     this.bookService.FilterBook(formData)
       .then(((response: any) => {
         if (response && response.data) {
+          console.log("Filtered books response:", response.data);
           this.Books = response.data.books as Book[];
           this.TotalBooks = response.data.count as number;
           if (this.Books) {

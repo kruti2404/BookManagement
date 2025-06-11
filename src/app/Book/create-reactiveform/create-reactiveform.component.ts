@@ -5,6 +5,7 @@ import { BookService } from 'src/app/core/Services/book.service';
 import { Book } from 'src/app/Shared/Models/Book/Book.Module';
 import { Response } from './../../Shared/Models/Response/Response.Module'
 import { formatDate } from '@angular/common';
+import { DatatransferService } from 'src/app/core/Services/datatransfer.service';
 @Component({
   selector: 'app-create-reactiveform',
   templateUrl: './create-reactiveform.component.html',
@@ -32,6 +33,7 @@ export class CreateReactiveformComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private bookService: BookService,
+    private datatransferService: DatatransferService,
     private route: ActivatedRoute,
     private router: Router
   ) { }
@@ -52,7 +54,7 @@ export class CreateReactiveformComponent implements OnInit {
     });
 
     if (this.iseditMode) {
-      this.bookService.getBookById(this.id ?? '')
+      this.datatransferService.getBookById(this.id ?? '')
         .then((value: any) => {
           console.log("Success: ", value);
           this.title?.setValue(value.data.title);
@@ -86,7 +88,7 @@ export class CreateReactiveformComponent implements OnInit {
 
 
 
-  submited() {
+  async submited() {
     this.loading = true;
     this.formSubmitted = true;
 
@@ -113,7 +115,7 @@ export class CreateReactiveformComponent implements OnInit {
           }
         });
 
-        this.editBook();
+        await this.editBook();
 
       }
       else {
@@ -143,6 +145,7 @@ export class CreateReactiveformComponent implements OnInit {
     this.bookService.createBook(this.formdata)
       .then((value: Response) => {
         console.log("Success:  ", value.message);
+        this.datatransferService.setBookModified();
       })
       .catch((error: any) => {
         console.error("Error: ", error);
@@ -150,10 +153,12 @@ export class CreateReactiveformComponent implements OnInit {
 
   }
 
-  editBook() {
-    this.bookService.editBook(this.formdata)
+ async editBook() {
+    console.log("Editing book with ID: ", this.formdata.get('id'));
+    await this.bookService.editBook(this.formdata)
       .then((value: any) => {
         console.log("Success:  ", value.message);
+        this.datatransferService.setBookModified();
       })
       .catch((error: any) => {
         console.error("Error: ", error);
